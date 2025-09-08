@@ -1,0 +1,1898 @@
+@import url('https://fonts.googleapis.com/css2?family=Questrial&amp;display=swap');
+/*!
+@EmilioSG11/videojs-luxmty-skin
+@Version - 2.5.1
+@Copyright (c) 2024 Emilio Salas
+@Designed By Emilio Salas
+(emiliosalasgzz@gmail.com),
+(https://www.github.com/EmilioSG11)
+(https://x.com/EmilioSGZ_)
+(https://ko-fi.com/emiliosg11)
+*/
+@font-face {
+  font-family: bootstrap-icons;
+  src: url(./fonts/bootstrap-icons.woff2) format('woff2');
+}
+:root {
+  --icon-spacing: 2.2rem;
+  --circle-progress-on-off: 0;
+  /*0 for make no visible, 1 for always visible*/
+}
+
+/*COLORS*/
+:root {
+  --primary-color: 240 100% 99%;
+  --secondary-color: 343 100% 35%;
+  --tertiary-color: 0 0% 1%;
+  --bg-primary: 0 0% 1%;
+  /*HSL code colors*/
+}
+
+/*Icons-Components Colors*/
+:root {
+  /*Play Control*/
+  --play-control: hsl(var(--secondary-color));
+  /*Big Play*/
+  --big-play: hsl(var(--secondary-color));
+  --big-play-border-color: hsl(var(--primary-color));
+  --bg-big-play: hsl(var(--bg-primary) / 0.45);
+  /*Volume*/
+  --mute: hsl(var(--secondary-color));
+  --volume-level: hsl(var(--primary-color));
+  --volume-level-circle: hsl(var(--secondary-color));
+  /*Fullscreen*/
+  --fullscreen: hsl(var(--secondary-color));
+  /*Picture In Picture*/
+  --pip-exit: hsl(var(--secondary-color));
+  /*Audio*/
+  --audio-description-menu-icon-color: #f8f8ff;
+  /*Captions*/
+  --cc-menu-icon-color: #f8f8ff;
+  /*Control Bar*/
+  --bg-control-bar: hsl(var(--bg-primary) / 0.8);
+  /*Live Control*/
+  --live-playing: red;
+  --live-paused: #888;
+  /*Scrollbar*/
+  --scrollbar: ghostwhite;
+  /*Time Control*/
+  --current-time: hsl(var(--primary-color));
+  --time-duration: hsl(var(--primary-color) / 0.6);
+  --time-divider: hsl(var(--secondary-color));
+  /*Progress Control*/
+  --bg-play-progress: hsl(var(--primary-color));
+  --bg-load-progress: hsl(var(--secondary-color) / 0.95);
+  --bg-load-progress-2: hsl(var(--secondary-color) / 0);
+  --circle-progress-color-1: hsl(var(--primary-color));
+  --circle-progress-color-2: hsl(var(--secondary-color));
+  /*Slider*/
+  --bg-slider: rgba(115, 133, 159, 0.5);
+  /*Menu*/
+  --bg-menu-popup: hsl(var(--bg-primary) / 0.8);
+  --bg-menu-li-hover: hsl(215 19% 54% / 0.5);
+  --bg-menu-selected: hsl(var(--secondary-color));
+  --menu-selected-item-text: #f8f8ff;
+  --check-menu-selected-icon: #f8f8ff;
+  /*Loading Spinner*/
+  --border-color-loading-spinner: hsl(var(--primary-color) / 1);
+  --spin-color-1: hsl(var(--secondary-color));
+  --spin-color-2: hsl(var(--secondary-color));
+  /*Title Bar*/
+  --title-bar: hsl(240 100% 99%);
+  --title-bar-descr: hsl(240 100% 99% / 0.65);
+  --title-bar-border-color: hsl(var(--secondary-color));
+  /*Error Display*/
+  --error-display-text: ghostwhite;
+  --default-error-display-xicon: hsl(var(--secondary-color));
+  /*Track Settings - 已移除，使用自定义字幕样式系统*/
+}
+
+/*Font Family*/
+:root {
+  --font: 'Questrial', 'Oswald', 'Arial', 'Helvetica', 'Sans Serif';
+  --icon-family: 'VideoJS', 'bootstrap-icons';
+}
+
+/*Font Sizes*/
+:root {
+  --base-font-size: 10px;
+  --icons-size: 2em;
+}
+
+/*Buttons-Icons Size*/
+:root {
+  --fs-play-control: 1.4em;
+  --fs-volume: 1em;
+  --fs-fullscreen: 1.4em;
+  --fs-pip-control: 1em;
+  --fs-pip-exit: 1.223em;
+  --fs-gear-quality: 0.92em;
+  --fs-big-play-icon: normal;
+  --fs-playback-rate-icon: 0.89em;
+}
+
+:root {
+  --fs-error-disp: 1.5em;
+  --fs-live-control: 1em;
+  --fs-live-ui-control: 1em;
+  --fs-menu-list: 1em;
+  --fs-menu-title: 1em;
+  --fs-time-control: 1em;
+  --fs-time-divider: 1.3em;
+  --fs-title-bar: 1.6em;
+  --fs-title-bar-mobile: 1.25em;
+  --fs-title-description: 1em;
+}
+
+/*Font Weights*/
+:root {
+  --fw-time-control: bold;
+  --fw-menu-li: bold;
+  --fw-menu-title: bold;
+  --fw-error-disp: bold;
+  --fw-title-bar: bolder;
+  --fw-captions-subs: 500;
+  --fw-title-description: 500;
+}
+
+*:focus {
+  outline: none;
+}
+
+/*.player-container {
+  background: #000;
+  max-width: 900px;
+  margin-right: auto;
+  margin-left: auto;
+  overflow: auto;
+}*/
+.vjs-luxmty {
+  display: inline-block;
+  vertical-align: top;
+  box-sizing: border-box;
+  color: #f8f8ff;
+  background-color: #000;
+  position: relative;
+  padding: 0;
+  font-family: var(--font);
+  font-size: var(--base-font-size);
+  line-height: 1;
+  font-weight: normal;
+  font-style: normal;
+  word-break: initial;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+.vjs-luxmty:-moz-full-screen {
+  position: absolute;
+}
+.vjs-luxmty:-webkit-full-screen {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/*BIG PLAY BUTTON*/
+.vjs-luxmty .vjs-big-play-button {
+  font-size: 3.5em;
+  line-height: 1.5em;
+  height: 1.7em;
+  width: 1.7em;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 0;
+  margin-top: unset;
+  margin-left: unset;
+  cursor: pointer;
+  opacity: 1;
+  border: 0.09666em solid var(--big-play-border-color);
+  background-color: var(--bg-big-play);
+  border-radius: 50%;
+  transition: none;
+  transform: translate(-50%, -50%);
+  color: var(--big-play);
+  z-index: 2;
+}
+
+.vjs-icon-play:before,
+.vjs-luxmty .vjs-big-play-button .vjs-icon-placeholder:before {
+  content: '\f101';
+  font-family: var(--icon-family);
+  font-size: var(--fs-big-play-icon);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.vjs-icon-replay:before,
+.vjs-luxmty.vjs-ended .vjs-big-play-button .vjs-icon-placeholder:before {
+  content: '\f11b';
+}
+
+.vjs-luxmty:hover .vjs-big-play-button,
+.vjs-luxmty .vjs-big-play-button:focus {
+  border-color: var(--big-play-border-color);
+  background-color: var(--bg-big-play);
+  transition: all 0s;
+}
+
+.vjs-controls-disabled .vjs-big-play-button,
+.vjs-has-started .vjs-big-play-button,
+.vjs-using-native-controls .vjs-big-play-button,
+.vjs-error .vjs-big-play-button {
+  display: none;
+}
+
+.vjs-has-started.vjs-paused.vjs-show-big-play-button-on-pause:not(
+    .vjs-seeking,
+    .vjs-scrubbing,
+    .vjs-error
+  )
+  .vjs-big-play-button {
+  display: block;
+}
+
+/*ICONS*/
+.vjs-luxmty .vjs-play-control {
+  cursor: pointer;
+  color: var(--play-control);
+  font-size: var(--fs-play-control);
+  bottom: -0.017em;
+}
+
+.vjs-luxmty .vjs-icon-play:before,
+.vjs-luxmty .vjs-play-control .vjs-icon-placeholder:before {
+  content: '\f101';
+}
+
+.vjs-luxmty .vjs-icon-play-circle:before {
+  content: '\f102';
+}
+
+.vjs-luxmty .vjs-icon-pause:before,
+.vjs-luxmty .vjs-play-control.vjs-playing .vjs-icon-placeholder:before {
+  content: '\f103';
+}
+
+.vjs-luxmty .vjs-icon-replay:before,
+.vjs-luxmty .vjs-play-control.vjs-ended .vjs-icon-placeholder:before {
+  content: '\f11b';
+}
+
+.vjs-luxmty .vjs-mute-control .vjs-icon-placeholder {
+  font-size: var(--fs-volume);
+}
+
+.vjs-icon-volume-mute:before,
+.vjs-luxmty .vjs-mute-control.vjs-vol-0 .vjs-icon-placeholder:before {
+  content: '\f104';
+  color: var(--mute);
+}
+
+.vjs-icon-volume-low:before,
+.vjs-luxmty .vjs-mute-control.vjs-vol-1 .vjs-icon-placeholder:before {
+  content: '\f105';
+}
+
+.vjs-icon-volume-mid:before,
+.vjs-luxmty .vjs-mute-control.vjs-vol-2 .vjs-icon-placeholder:before {
+  content: '\f106';
+}
+
+.vjs-icon-volume-high:before,
+.vjs-luxmty .vjs-mute-control .vjs-icon-placeholder:before {
+  content: '\f107';
+}
+
+.vjs-luxmty .vjs-fullscreen-control {
+  font-size: var(--fs-fullscreen);
+  color: var(--fullscreen);
+  cursor: pointer;
+  flex: none;
+}
+
+.vjs-luxmty .vjs-icon-fullscreen-enter:before,
+.vjs-luxmty .vjs-fullscreen-control .vjs-icon-placeholder:before {
+  content: '\f108';
+}
+
+.vjs-luxmty .vjs-icon-fullscreen-exit:before,
+.vjs-luxmty.vjs-fullscreen .vjs-fullscreen-control .vjs-icon-placeholder:before {
+  content: '\f109';
+}
+
+.vjs-luxmty .vjs-picture-in-picture-control {
+  font-size: var(--fs-pip-control);
+}
+
+.vjs-luxmty .vjs-icon-picture-in-picture-enter:before,
+.vjs-luxmty .vjs-picture-in-picture-control .vjs-icon-placeholder:before {
+  content: '\f127';
+}
+
+.vjs-luxmty .vjs-icon-picture-in-picture-exit:before,
+.vjs-luxmty.vjs-picture-in-picture .vjs-picture-in-picture-control .vjs-icon-placeholder:before {
+  content: '\f128';
+  color: var(--pip-exit);
+  font-size: var(--fs-pip-exit);
+}
+
+/*SUBTITLES ICONS*/
+.vjs-luxmty .vjs-icon-subtitles,
+.vjs-luxmty .vjs-subs-caps-button .vjs-icon-placeholder,
+.vjs-luxmty.video-js:lang(en-GB) .vjs-subs-caps-button .vjs-icon-placeholder,
+.vjs-luxmty.video-js:lang(en-IE) .vjs-subs-caps-button .vjs-icon-placeholder,
+.vjs-luxmty.video-js:lang(en-AU) .vjs-subs-caps-button .vjs-icon-placeholder,
+.vjs-luxmty.video-js:lang(en-NZ) .vjs-subs-caps-button .vjs-icon-placeholder,
+.vjs-luxmty .vjs-subtitles-button .vjs-icon-placeholder {
+  font-size: 1.1em;
+}
+
+.vjs-luxmty .vjs-icon-subtitles:before,
+.vjs-luxmty .vjs-subs-caps-button .vjs-icon-placeholder:before,
+.vjs-luxmty.video-js:lang(en-GB) .vjs-subs-caps-button .vjs-icon-placeholder:before,
+.vjs-luxmty.video-js:lang(en-IE) .vjs-subs-caps-button .vjs-icon-placeholder:before,
+.vjs-luxmty.video-js:lang(en-AU) .vjs-subs-caps-button .vjs-icon-placeholder:before,
+.vjs-luxmty.video-js:lang(en-NZ) .vjs-subs-caps-button .vjs-icon-placeholder:before,
+.vjs-luxmty .vjs-subtitles-button .vjs-icon-placeholder:before {
+  content: '\f10b';
+}
+
+.vjs-luxmty .vjs-icon-captions:before,
+.vjs-luxmty:lang(en) .vjs-subs-caps-button .vjs-icon-placeholder:before,
+.vjs-luxmty:lang(fr-CA) .vjs-subs-caps-button .vjs-icon-placeholder:before,
+.vjs-luxmty .vjs-captions-button .vjs-icon-placeholder:before {
+  content: '\f10c';
+}
+
+.vjs-luxmty
+  .vjs-subs-caps-button
+  + .vjs-menu
+  .vjs-captions-menu-item
+  .vjs-menu-item-text
+  .vjs-icon-placeholder:before {
+  font-family: var(--icon-family);
+  content: '\f10c';
+  color: var(--cc-menu-icon-color);
+}
+
+/*BACKWARD AND FORWARD ICONS*/
+.vjs-luxmty .vjs-icon-replay-5:before,
+.vjs-luxmty .vjs-skip-backward-5 .vjs-icon-placeholder:before {
+  content: '\f11c';
+}
+
+.vjs-icon-replay-10:before,
+.vjs-luxmty .vjs-skip-backward-10 .vjs-icon-placeholder:before {
+  content: '\f11d';
+}
+
+.vjs-icon-replay-30:before,
+.vjs-luxmty .vjs-skip-backward-30 .vjs-icon-placeholder:before {
+  content: '\f11e';
+}
+
+.vjs-icon-forward-5:before,
+.vjs-luxmty .vjs-skip-forward-5 .vjs-icon-placeholder:before {
+  content: '\f11f';
+}
+
+.vjs-icon-forward-10:before,
+.vjs-luxmty .vjs-skip-forward-10 .vjs-icon-placeholder:before {
+  content: '\f120';
+}
+
+.vjs-icon-forward-30:before,
+.vjs-luxmty .vjs-skip-forward-30 .vjs-icon-placeholder:before {
+  content: '\f121';
+}
+
+.vjs-luxmty.vjs-live .vjs-skip-forward-5 {
+  display: none;
+}
+
+.vjs-luxmty.vjs-live .vjs-skip-forward-10 {
+  display: none;
+}
+
+.vjs-luxmty.vjs-live .vjs-skip-forward-30 {
+  display: none;
+}
+
+/*GEAR AND HD ICON*/
+.vjs-luxmty .vjs-icon-cog {
+  font-size: var(--fs-gear-quality);
+}
+
+.vjs-luxmty .vjs-icon-cog:before {
+  content: '\f114';
+}
+
+.vjs-luxmty .vjs-icon-hd {
+  font-size: 1em;
+}
+
+.vjs-luxmty .vjs-icon-hd:before {
+  content: '\f10d';
+}
+
+/*PLAYBACK RATE SPEED ICON SECTION*/
+.vjs-luxmty .vjs-playback-rate > .vjs-menu-button,
+.vjs-luxmty .vjs-playback-rate .vjs-playback-rate-value {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.vjs-luxmty .vjs-playback-rate > .vjs-menu-button,
+.vjs-luxmty .vjs-playback-rate .vjs-icon-placeholder {
+  font-size: var(--fs-playback-rate-icon);
+}
+
+.vjs-luxmty .vjs-playback-rate > .vjs-menu-button,
+.vjs-luxmty .vjs-playback-rate .vjs-icon-placeholder:before {
+  content: '\f292';
+}
+
+.vjs-luxmty .vjs-playback-rate .vjs-playback-rate-value {
+  pointer-events: none;
+  font-size: 1.5em;
+  line-height: 2;
+  text-align: center;
+  display: none;
+}
+
+.vjs-luxmty .vjs-playback-rate .vjs-menu {
+  width: 4em;
+  left: 0em;
+}
+
+.vjs-luxmty.vjs-layout-small .vjs-playback-rate,
+.vjs-luxmty.vjs-layout-x-small .vjs-playback-rate,
+.vjs-luxmty.vjs-layout-tiny .vjs-playback-rate {
+  display: flex;
+}
+
+.vjs-luxmty.vjs-live .vjs-playback-rate {
+  display: none;
+}
+
+.vjs-luxmty .vjs-icon-audio:before,
+.vjs-luxmty .vjs-audio-button .vjs-icon-placeholder:before {
+  content: '\f122';
+}
+
+.vjs-luxmty
+  .vjs-audio-button
+  + .vjs-menu
+  .vjs-main-desc-menu-item
+  .vjs-menu-item-text
+  .vjs-icon-placeholder {
+  vertical-align: middle;
+  display: inline-block;
+  margin-bottom: -0.1em;
+}
+
+.vjs-luxmty
+  .vjs-audio-button
+  + .vjs-menu
+  .vjs-main-desc-menu-item
+  .vjs-menu-item-text
+  .vjs-icon-placeholder:before {
+  content: '\f12e';
+  color: var(--audio-description-menu-icon-color);
+  font-family: var(--icon-family);
+  font-size: 1.5em;
+  line-height: inherit;
+}
+
+.vjs-luxmty .vjs-icon-audio-description:before,
+.vjs-luxmty .vjs-descriptions-button .vjs-icon-placeholder:before {
+  content: '\f12e';
+}
+
+.vjs-luxmty .vjs-icon-chapters,
+.vjs-luxmty .vjs-chapters-button .vjs-icon-placeholder {
+  font-size: 1.15em;
+}
+
+.vjs-luxmty .vjs-icon-chapters:before,
+.vjs-luxmty .vjs-chapters-button .vjs-icon-placeholder:before {
+  content: '\f10e';
+}
+
+.vjs-chapters-button .vjs-menu ul {
+  width: 24em;
+}
+
+/*SHARE SOCIAL ICONS*/
+.vjs-luxmty .vjs-icon-share {
+  font-size: 1em;
+}
+
+.vjs-luxmty .vjs-icon-share:before {
+  content: '\f113';
+}
+
+.vjs-luxmty .vjs-icon-facebook,
+.vjs-luxmty .vjs-icon-pinterest {
+  font-size: 1em;
+}
+
+.vjs-luxmty .vjs-icon-facebook:before {
+  content: '\f129';
+  color: #0165e1;
+}
+
+.vjs-luxmty .vjs-icon-linkedin {
+  font-size: 1em;
+}
+
+.vjs-luxmty .vjs-icon-linkedin:before {
+  content: '\f12a';
+  color: #fff;
+}
+
+.vjs-luxmty .vjs-icon-twitter {
+  font-size: 0.76em;
+}
+
+.vjs-luxmty .vjs-icon-twitter:before {
+  content: '\f8db';
+}
+
+.vjs-luxmty .vjs-icon-tumblr:before {
+  content: '\f12c';
+  color: #34465d;
+}
+
+.vjs-luxmty .vjs-icon-pinterest:before {
+  content: '\f12d';
+  color: #e60023;
+}
+
+/*SECONDARY ICONS*/
+.vjs-luxmty .vjs-icon-cancel:before,
+.vjs-luxmty .vjs-control.vjs-close-button .vjs-icon-placeholder:before {
+  content: '\f622';
+}
+
+.vjs-luxmty .vjs-icon-cast:before {
+  content: '\f126';
+}
+
+.vjs-luxmty .vjs-icon-circle {
+  font-size: 1em;
+}
+
+.vjs-luxmty .vjs-icon-circle:before,
+.vjs-luxmty .vjs-volume-level:before,
+.vjs-luxmty .vjs-play-progress:before {
+  content: '\f116';
+}
+
+.vjs-luxmty .vjs-icon-circle-outline {
+  font-size: 1em;
+}
+
+.vjs-luxmty .vjs-icon-circle-outline:before {
+  content: '\f117';
+}
+
+.vjs-luxmty .vjs-icon-circle-inner-circle {
+  font-size: 1em;
+}
+
+.vjs-luxmty .vjs-icon-circle-inner-circle:before {
+  content: '\f118';
+}
+
+.vjs-luxmty .vjs-icon-downloading:before {
+  content: '\f10f';
+}
+
+.vjs-luxmty .vjs-icon-file-download:before {
+  content: '\f110';
+}
+
+.vjs-luxmty .vjs-icon-file-download-done:before {
+  content: '\f111';
+}
+
+.vjs-luxmty .vjs-icon-file-download-off:before {
+  content: '\f112';
+}
+
+.vjs-luxmty .vjs-icon-next-item:before {
+  content: '\f123';
+}
+
+.vjs-luxmty .vjs-icon-previous-item:before {
+  content: '\f124';
+}
+
+.vjs-luxmty .vjs-icon-repeat:before {
+  content: '\f11a';
+}
+
+.vjs-luxmty .vjs-icon-shuffle:before {
+  content: '\f125';
+}
+
+.vjs-luxmty .vjs-icon-square {
+  font-size: 1em;
+}
+
+.vjs-luxmty .vjs-icon-square:before {
+  content: '\f115';
+}
+
+.vjs-luxmty .vjs-icon-spinner:before {
+  content: '\f10a';
+}
+
+.vjs-luxmty button {
+  background: none;
+  border: none;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: inherit;
+  line-height: inherit;
+  text-transform: none;
+  text-decoration: none;
+  transition: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.vjs-control .vjs-button {
+  width: 100%;
+  height: 100%;
+}
+
+/*CONTROL BAR*/
+.vjs-luxmty .vjs-control-bar {
+  display: none;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 5.5em;
+  background-color: var(--bg-control-bar);
+  padding: 0.7em 1em 0.45em 0.7em;
+  z-index: 2;
+}
+
+.vjs-luxmty.vjs-has-started .vjs-control-bar,
+.vjs-audio-only-mode .vjs-control-bar {
+  display: flex;
+  visibility: visible;
+  opacity: 1;
+  transition:
+    all cubic-bezier(0.45, 0.44, 0.67, 0.66),
+    ease-in-out 0.5s;
+}
+
+.vjs-luxmty.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
+  visibility: visible;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(0, 4em);
+  transition:
+    all cubic-bezier(0.45, 0.44, 0.67, 0.66),
+    ease-in-out 0.5s;
+}
+
+/*CONTROL*/
+.vjs-luxmty .vjs-control {
+  position: relative;
+  text-align: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: var(--icon-spacing);
+  flex: none;
+}
+
+.vjs-luxmty .vjs-control:before {
+  font-family: var(--icon-family);
+  font-size: var(--icons-size);
+}
+
+.vjs-luxmty .vjs-control.vjs-visible-text {
+  width: auto;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+.vjs-button > .vjs-icon-placeholder:before {
+  font-family: var(--icon-family);
+  font-size: var(--icons-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vjs-button > .vjs-icon-placeholder {
+  display: block;
+}
+
+.vjs-luxmty .vjs-control:focus:before,
+.vjs-luxmty .vjs-control:hover:before,
+.vjs-luxmty .vjs-control:focus {
+  text-shadow: 0em 0em 1em transparent;
+}
+
+.vjs-luxmty .vjs-custom-control-spacer {
+  display: flex;
+  flex: 1 1 auto;
+}
+
+/*LIVE CONTROL*/
+.vjs-luxmty .vjs-live-control {
+  display: flex;
+  align-items: center;
+  flex: auto;
+  font-family: var(--font);
+  font-size: var(--fs-live-control);
+  font-weight: bold;
+  line-height: 1em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.vjs-luxmty .vjs-live-control:before {
+  margin-right: 0.5em;
+  content: '\f116';
+  font-family: var(--icon-family);
+  font-size: 1em;
+}
+
+.vjs-luxmty:not(.vjs-live) .vjs-live-control,
+.vjs-luxmty.vjs-liveui .vjs-live-control {
+  display: none;
+}
+
+.vjs-luxmty .vjs-seek-to-live-control {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex: none;
+  font-family: var(--font);
+  font-size: var(--fs-live-ui-control);
+  font-weight: bold;
+  height: 100%;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  line-height: 1em;
+  width: auto;
+  min-width: 4em;
+}
+
+.vjs-icon-circle:before,
+.vjs-luxmty .vjs-seek-to-live-control .vjs-icon-placeholder:before {
+  content: '\f116';
+}
+
+.vjs-luxmty.vjs-live:not(.vjs-liveui) .vjs-seek-to-live-control,
+.vjs-luxmty:not(.vjs-live) .vjs-seek-to-live-control {
+  display: none;
+}
+
+.vjs-seek-to-live-control.vjs-control.vjs-at-live-edge {
+  cursor: auto;
+}
+
+.vjs-seek-to-live-control .vjs-icon-placeholder,
+.vjs-paused .vjs-live-control:before,
+.vjs-waiting .vjs-live-control:before,
+.vjs-seeking .vjs-live-control:before {
+  color: var(--live-paused);
+}
+
+.vjs-luxmty .vjs-live-control:before,
+.vjs-seek-to-live-control.vjs-control.vjs-at-live-edge .vjs-icon-placeholder {
+  color: var(--live-playing);
+}
+
+.vjs-luxmty .vjs-seek-to-live-control .vjs-icon-placeholder {
+  font-size: 1.044em;
+  margin-bottom: 0.07em;
+}
+
+.vjs-luxmty .vjs-live-control:before,
+.vjs-luxmty .vjs-seek-to-live-control .vjs-icon-placeholder {
+  animation: blink 1.1s ease-in-out 0s infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/*TIME CONTROL*/
+.vjs-luxmty .vjs-time-control {
+  flex: none;
+  font-size: var(--fs-time-control);
+  font-weight: var(--fw-time-control);
+  line-height: 0;
+  width: auto;
+  height: auto;
+  min-width: 0em;
+  padding: 0em 0.25em 0em 0.25em;
+}
+.vjs-luxmty .vjs-time-control,
+.vjs-luxmty .vjs-time-divider,
+.vjs-luxmty .vjs-time-divider div span,
+.vjs-luxmty .vjs-current-time,
+.vjs-luxmty .vjs-duration,
+.vjs-luxmty .vjs-remaining-time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.vjs-luxmty .vjs-current-time {
+  color: var(--current-time);
+}
+.vjs-luxmty .vjs-time-divider {
+  color: var(--time-divider);
+  padding: 0.085em 0em 0 0.095em;
+}
+.vjs-luxmty .vjs-time-divider div span {
+  font-size: var(--fs-time-divider);
+}
+.vjs-luxmty .vjs-duration {
+  color: var(--time-duration);
+}
+.vjs-luxmty .vjs-remaining-time {
+  display: none;
+}
+
+.vjs-luxmty.vjs-layout-small .vjs-time-control,
+.vjs-luxmty.vjs-layout-x-small .vjs-time-control,
+.vjs-luxmty.vjs-layout-tiny .vjs-time-control {
+  display: flex;
+}
+
+.vjs-luxmty.vjs-live .vjs-time-control {
+  display: none;
+}
+
+/*PROGRESS CONTROL*/
+.vjs-luxmty .vjs-progress-control {
+  cursor: pointer;
+  flex: auto;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 4em;
+  height: auto;
+  position: absolute;
+  left: 0;
+  padding-top: 1.3em;
+  padding-right: 0.194em;
+  top: -1.831em;
+  touch-action: none;
+}
+
+.vjs-luxmty .vjs-play-progress {
+  background: var(--bg-play-progress);
+}
+
+.vjs-luxmty .vjs-load-progress {
+  background: var(--bg-load-progress);
+}
+
+.vjs-luxmty .vjs-load-progress div {
+  background: var(--bg-load-progress-2);
+}
+
+.vjs-luxmty.vjs-live .vjs-progress-control {
+  display: none;
+}
+
+.vjs-luxmty.vjs-liveui .vjs-progress-control {
+  display: flex;
+  align-items: center;
+}
+
+/*Progress Holder*/
+.vjs-luxmty .vjs-progress-holder {
+  flex: auto;
+  transition: all 0.1s;
+  height: 0.3em;
+  border-radius: 0.3em;
+}
+
+.vjs-luxmty .vjs-progress-control .vjs-progress-holder {
+  margin: 0 10px;
+}
+
+.vjs-luxmty .vjs-progress-holder {
+  font-size: 1.77em;
+}
+
+.vjs-luxmty .vjs-progress-control:hover .vjs-progress-holder {
+  font-size: 1.77em;
+}
+
+.vjs-luxmty .vjs-progress-holder .vjs-play-progress,
+.vjs-luxmty .vjs-progress-holder .vjs-load-progress,
+.vjs-luxmty .vjs-progress-holder .vjs-load-progress div {
+  position: absolute;
+  display: block;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 0;
+  opacity: 1;
+  border-radius: 0.3em;
+}
+
+/*Progress Circle*/
+.vjs-luxmty .vjs-play-progress {
+  font-family: var(--icon-family);
+  z-index: 2;
+}
+.vjs-luxmty .vjs-play-progress:before,
+.vjs-luxmty .vjs-play-progress:after {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--circle-progress-color-1);
+  background-color: var(--circle-progress-color-2);
+  border-radius: 50%;
+  font-size: 1em;
+  transform: scale(0.78, 0.78);
+  content: '\f517';
+  height: 0.5em;
+  width: 0.5em;
+  right: -0.29em;
+  top: -0.08245em;
+  line-height: unset;
+  transition: all ease 0.2s;
+  visibility: visible;
+  opacity: var(--circle-progress-on-off);
+}
+
+.vjs-luxmty .vjs-progress-control:hover .vjs-play-progress:before {
+  transform: scale(0.9, 0.9);
+  opacity: 1;
+}
+
+.vjs-luxmty.vjs-scrubbing .vjs-progress-control:hover .vjs-play-progress:before {
+  transform: scale(0.9, 0.9);
+  transition: all ease-out 0.2s;
+  opacity: 1;
+}
+
+.vjs-luxmty .vjs-time-tooltip {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 0.3em;
+  color: #000;
+  float: right;
+  font-family: var(--font);
+  font-size: 1em;
+  padding: 6px 8px 8px 8px;
+  pointer-events: none;
+  position: absolute;
+  top: -3.4em;
+  text-shadow: none;
+  visibility: hidden;
+  z-index: 1;
+}
+
+.vjs-luxmty .vjs-progress-holder:focus .vjs-time-tooltip {
+  display: none;
+}
+
+.vjs-luxmty .vjs-progress-control:hover .vjs-time-tooltip,
+.vjs-luxmty .vjs-progress-control:hover .vjs-progress-holder:focus .vjs-time-tooltip {
+  display: block;
+  font-size: 0.6em;
+  visibility: visible;
+}
+
+.vjs-luxmty .vjs-progress-control.disabled:hover .vjs-time-tooltip {
+  font-size: 1em;
+}
+
+.vjs-luxmty .vjs-progress-control .vjs-mouse-display {
+  display: none;
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background-color: #000;
+  z-index: 1;
+}
+
+.vjs-luxmty .vjs-progress-control:hover .vjs-mouse-display {
+  display: block;
+}
+
+.vjs-luxmty.vjs-user-inactive .vjs-progress-control .vjs-mouse-display {
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 1s,
+    opacity 1s;
+}
+
+.vjs-mouse-display .vjs-time-tooltip {
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/*MENU*/
+.vjs-luxmty .vjs-menu-button .vjs-hidden {
+  display: block !important;
+  transform: scale(0);
+}
+
+.vjs-menu-button {
+  cursor: pointer;
+}
+
+.vjs-menu-button.vjs-disabled {
+  cursor: default;
+}
+
+.vjs-workinghover .vjs-menu-button.vjs-disabled:hover .vjs-menu {
+  display: none;
+}
+
+.vjs-luxmty .vjs-menu .vjs-menu-content {
+  display: block;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font);
+  overflow: auto;
+}
+
+.vjs-menu .vjs-menu-content > * {
+  box-sizing: border-box;
+}
+
+.vjs-scrubbing .vjs-control.vjs-menu-button:hover .vjs-menu {
+  display: none;
+}
+
+.vjs-luxmty .vjs-lock-showing {
+  display: block;
+  transform: scale(1) !important;
+}
+
+.vjs-luxmty .vjs-menu li {
+  display: flex;
+  justify-content: center;
+  color: ghostwhite;
+  list-style: none;
+  font-size: var(--fs-menu-list);
+  font-weight: var(--fw-menu-li);
+  text-transform: lowercase;
+  text-align: center;
+  line-height: 1.4em;
+  padding: 0.35em;
+  width: auto;
+}
+
+.vjs-luxmty .vjs-menu li.vjs-menu-item:focus {
+  background-color: transparent;
+}
+
+.vjs-luxmty .vjs-menu li.vjs-menu-item:hover,
+.vjs-luxmty .js-focus-visible .vjs-menu li.vjs-menu-item:hover {
+  background-color: var(--bg-menu-li-hover);
+}
+
+.vjs-luxmty .vjs-menu li.vjs-selected,
+.vjs-luxmty .vjs-menu li.vjs-selected:focus,
+.vjs-luxmty .vjs-menu li.vjs-selected:hover,
+.vjs-luxmty .js-focus-visible .vjs-menu li.vjs-selected:hover {
+  color: var(--menu-selected-item-text);
+  background-color: var(--bg-menu-selected);
+  padding-right: 2em;
+  padding-left: 2.08em;
+}
+
+.vjs-luxmty .vjs-menu li.vjs-selected:before {
+  font-family: var(--icon-family);
+  font-size: 0.8em;
+  font-weight: bolder;
+  content: '\f26a';
+  color: var(--check-menu-selected-icon);
+  padding-right: 1em;
+  padding-left: 0;
+  text-align: left;
+  margin-left: -2.15em;
+  line-height: 1.7em;
+}
+
+.vjs-luxmty .vjs-menu *:not(.vjs-selected):focus:not(:focus-visible),
+.vjs-luxmty .js-focus-visible .vjs-menu *:not(.vjs-selected):focus:not(.focus-visible) {
+  background: none;
+}
+
+.vjs-luxmty .vjs-menu li.vjs-menu-title {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: var(--fs-menu-title);
+  font-weight: var(--fw-menu-title);
+  line-height: 2em;
+  padding: 0.45em 0 0.3em 0;
+  margin: 0em 0 0.3em 0;
+  cursor: default;
+}
+
+.vjs-luxmty .vjs-menu-button-popup .vjs-menu {
+  display: block;
+  position: absolute;
+  bottom: 3.5em; /*Not change this*/
+  left: -3em;
+  width: 10em;
+  height: 100%;
+  margin-bottom: unset;
+  border-top-color: var(--bg-menu-popup);
+  transform: scale(0);
+  transition: all 0.3s;
+  transform-origin: bottom center;
+  z-index: 200;
+}
+
+.vjs-luxmty .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  position: absolute;
+  bottom: 1.55em; /*Modifify this if you want modify the top/bottom position of menu popup*/
+  background-color: var(--bg-menu-popup);
+  width: 100%;
+  max-height: 15em;
+}
+
+.vjs-luxmty .vjs-pip-window .vjs-menu-button-popup .vjs-menu {
+  left: unset;
+  right: 1em;
+}
+
+.vjs-layout-large .vjs-menu-button-popup .vjs-menu .vjs-menu-content,
+.vjs-layout-x-large .vjs-menu-button-popup .vjs-menu .vjs-menu-content,
+.vjs-layout-huge .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  max-height: 25em;
+}
+
+.vjs-layout-medium .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  max-height: 14em;
+}
+
+.vjs-layout-small .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  max-height: 11em;
+}
+
+.vjs-layout-x-small .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  max-height: 9em;
+}
+
+.vjs-workinghover .vjs-menu-button-popup.vjs-hover .vjs-menu,
+.vjs-menu-button-popup .vjs-menu.vjs-lock-showing {
+  display: block;
+}
+
+.vjs-luxmty .vjs-menu-button-inline {
+  transition: all 0.4s;
+  overflow: hidden;
+}
+
+.vjs-luxmty .vjs-menu-button-inline:before {
+  width: 2.222222222em;
+}
+
+.vjs-luxmty .vjs-menu-button-inline:hover,
+.vjs-luxmty .vjs-menu-button-inline:focus,
+.vjs-luxmty .vjs-menu-button-inline.vjs-slider-active {
+  width: 12em;
+}
+
+.vjs-menu-button-inline .vjs-menu {
+  opacity: 0;
+  height: 100%;
+  width: auto;
+  position: absolute;
+  left: 4em;
+  top: 0;
+  padding: 0;
+  margin: 0;
+  transition: all 0.4s;
+}
+
+.vjs-menu-button-inline:hover .vjs-menu,
+.vjs-menu-button-inline:focus .vjs-menu,
+.vjs-menu-button-inline.vjs-slider-active .vjs-menu {
+  display: block;
+  opacity: 1;
+}
+
+.vjs-menu-button-inline .vjs-menu-content {
+  width: auto;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+/*SLIDER*/
+.vjs-luxmty .vjs-slider {
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  margin: 0 0.45em 0 0.45em;
+  /* iOS Safari */
+  -webkit-touch-callout: none;
+  /* Safari, and Chrome 53 */
+  -webkit-user-select: none;
+  /* Non-prefixed version, currently supported by Chrome and Opera */
+  user-select: none;
+  background-color: var(--bg-slider);
+}
+
+.vjs-luxmty .vjs-slider.disabled {
+  cursor: default;
+}
+
+.vjs-luxmty .vjs-slider:focus {
+  text-shadow: 0em 0em 1em #f8f8ff;
+  box-shadow: 0 0 1em #f8f8ff;
+}
+
+/*VOLUME PANEL*/
+.vjs-luxmty .vjs-volume-control.vjs-volume-horizontal {
+  width: 5em;
+}
+
+.vjs-luxmty .vjs-volume-panel .vjs-volume-control {
+  visibility: visible;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin-left: -1px;
+}
+
+.vjs-luxmty .vjs-volume-panel {
+  transition: width 1s;
+}
+.vjs-luxmty .vjs-volume-panel.vjs-hover .vjs-volume-control,
+.vjs-luxmty .vjs-volume-panel:active .vjs-volume-control,
+.vjs-luxmty .vjs-volume-panel:focus .vjs-volume-control,
+.vjs-luxmty .vjs-volume-panel .vjs-volume-control:active,
+.vjs-luxmty .vjs-volume-panel.vjs-hover .vjs-mute-control ~ .vjs-volume-control,
+.vjs-luxmty .vjs-volume-panel .vjs-volume-control.vjs-slider-active {
+  visibility: visible;
+  opacity: 1;
+  position: relative;
+  transition:
+    visibility 0.1s,
+    opacity 0.1s,
+    height 0.1s,
+    width 0.1s,
+    left 0s,
+    top 0s;
+}
+.vjs-luxmty .vjs-volume-panel.vjs-hover .vjs-volume-control.vjs-volume-horizontal,
+.vjs-luxmty .vjs-volume-panel:active .vjs-volume-control.vjs-volume-horizontal,
+.vjs-luxmty .vjs-volume-panel:focus .vjs-volume-control.vjs-volume-horizontal,
+.vjs-luxmty .vjs-volume-panel .vjs-volume-control:active.vjs-volume-horizontal,
+.vjs-luxmty
+  .vjs-volume-panel.vjs-hover
+  .vjs-mute-control
+  ~ .vjs-volume-control.vjs-volume-horizontal,
+.vjs-luxmty .vjs-volume-panel .vjs-volume-control.vjs-slider-active.vjs-volume-horizontal {
+  width: 5em;
+  height: 3em;
+  margin-right: 0;
+}
+.vjs-luxmty .vjs-volume-panel.vjs-hover .vjs-volume-control.vjs-volume-vertical,
+.vjs-luxmty .vjs-volume-panel:active .vjs-volume-control.vjs-volume-vertical,
+.vjs-luxmty .vjs-volume-panel:focus .vjs-volume-control.vjs-volume-vertical,
+.vjs-luxmty .vjs-volume-panel .vjs-volume-control:active.vjs-volume-vertical,
+.vjs-luxmty .vjs-volume-panel.vjs-hover .vjs-mute-control ~ .vjs-volume-control.vjs-volume-vertical,
+.vjs-luxmty .vjs-volume-panel .vjs-volume-control.vjs-slider-active.vjs-volume-vertical {
+  left: -3em;
+  transition: left 0s;
+}
+.vjs-luxmty .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-hover,
+.vjs-luxmty .vjs-volume-panel.vjs-volume-panel-horizontal:active,
+.vjs-luxmty .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-slider-active {
+  width: 9em;
+  transition: width 0.1s;
+}
+.vjs-luxmty .vjs-volume-panel.vjs-volume-panel-horizontal.vjs-mute-toggle-only {
+  width: 3.5em;
+}
+
+.vjs-luxmty .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
+  height: 8em;
+  width: 3em;
+  left: -3000em;
+  transition:
+    visibility 1s,
+    opacity 1s,
+    height 1s 1s,
+    width 1s 1s,
+    left 1s 1s,
+    top 1s 1s;
+}
+
+.vjs-luxmty .vjs-volume-panel .vjs-volume-control.vjs-volume-horizontal {
+  transition:
+    visibility 1s,
+    opacity 1s,
+    height 1s 1s,
+    width 1s,
+    left 1s 1s,
+    top 1s 1s;
+}
+
+.vjs-luxmty .vjs-volume-panel {
+  display: flex;
+}
+
+.vjs-luxmty .vjs-volume-bar {
+  margin: 1.35em 0.45em;
+}
+
+.vjs-luxmty .vjs-volume-bar.vjs-slider-horizontal {
+  width: 5em;
+  height: 0.3em;
+}
+
+.vjs-luxmty .vjs-volume-bar.vjs-slider-vertical {
+  width: 0.3em;
+  height: 5em;
+  margin: 1.35em auto;
+}
+
+.vjs-luxmty .vjs-volume-level {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: var(--volume-level);
+}
+.vjs-luxmty .vjs-volume-level:before {
+  position: absolute;
+  color: var(--volume-level-circle);
+  font-size: 1em;
+  z-index: 1;
+  content: '\f116';
+}
+
+.vjs-luxmty .vjs-slider-vertical .vjs-volume-level {
+  width: 0.3em;
+}
+.vjs-luxmty .vjs-slider-vertical .vjs-volume-level:before {
+  top: -0.5em;
+  left: -0.32em;
+  z-index: 1;
+}
+
+.vjs-luxmty .vjs-slider-horizontal .vjs-volume-level {
+  height: 0.3em;
+}
+.vjs-luxmty .vjs-slider-horizontal .vjs-volume-level:before {
+  line-height: 0.35em;
+  right: -0.5em;
+}
+
+.vjs-luxmty .vjs-volume-panel.vjs-volume-panel-vertical {
+  width: 3.3em;
+}
+
+.vjs-luxmty .vjs-volume-bar.vjs-slider-vertical .vjs-volume-level {
+  height: 100%;
+}
+
+.vjs-luxmty .vjs-volume-bar.vjs-slider-horizontal .vjs-volume-level {
+  width: 100%;
+}
+
+.vjs-luxmty .vjs-volume-vertical {
+  width: 3em;
+  height: 8em;
+  bottom: 7.5em;
+  background-color: #000;
+}
+
+.vjs-luxmty .vjs-volume-horizontal .vjs-menu {
+  left: -2em;
+}
+
+.vjs-luxmty .vjs-volume-tooltip {
+  border-radius: 0.3em;
+  color: #000;
+  float: right;
+  font-family: var(--font);
+  font-size: 1em;
+  padding: 6px 8px 8px 8px;
+  pointer-events: none;
+  position: absolute;
+  top: -3.4em;
+  visibility: hidden;
+  z-index: 1;
+}
+
+.vjs-luxmty .vjs-volume-control:hover .vjs-volume-tooltip,
+.vjs-luxmty .vjs-volume-control:hover .vjs-progress-holder:focus .vjs-volume-tooltip {
+  display: block;
+  font-size: 1em;
+  visibility: visible;
+}
+
+.vjs-luxmty .vjs-volume-vertical:hover .vjs-volume-tooltip,
+.vjs-luxmty .vjs-volume-vertical:hover .vjs-progress-holder:focus .vjs-volume-tooltip {
+  left: 1em;
+  top: -12px;
+}
+
+.vjs-luxmty .vjs-volume-control.disabled:hover .vjs-volume-tooltip {
+  font-size: 1em;
+}
+
+.vjs-luxmty .vjs-volume-control .vjs-mouse-display {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background-color: #000;
+  z-index: 1;
+}
+
+.vjs-luxmty .vjs-volume-horizontal .vjs-mouse-display {
+  width: 1px;
+  height: 100%;
+}
+
+.vjs-luxmty .vjs-volume-control:hover .vjs-mouse-display {
+  display: block;
+}
+
+.vjs-luxmty.vjs-user-inactive .vjs-volume-control .vjs-mouse-display {
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 1s,
+    opacity 1s;
+}
+
+.vjs-mouse-display .vjs-volume-tooltip {
+  color: #fff;
+}
+
+.vjs-luxmty.vjs-error .vjs-error-display .vjs-modal-dialog-content {
+  font-size: var(--fs-error-disp);
+  text-align: center;
+}
+
+/*LOADING SPINNER*/
+.vjs-luxmty .vjs-loading-spinner {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  text-align: left;
+  box-sizing: border-box;
+  background-clip: padding-box;
+  width: 5em;
+  height: 5em;
+  border-radius: 50%;
+  visibility: hidden;
+  border: none;
+}
+
+.vjs-luxmty.vjs-seeking .vjs-loading-spinner,
+.vjs-luxmty.vjs-waiting .vjs-loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: vjs-spinner-show 0s linear 0.3s forwards;
+}
+
+.vjs-luxmty.vjs-error .vjs-loading-spinner {
+  display: none;
+}
+
+.vjs-luxmty .vjs-loading-spinner:before {
+  content: '';
+  border-width: 0.55em;
+  border-style: solid;
+  border-color: var(--border-color-loading-spinner);
+  position: absolute;
+  box-sizing: inherit;
+  width: inherit;
+  height: inherit;
+  border-radius: inherit;
+  margin: unset;
+  opacity: 1;
+}
+
+.vjs-luxmty.vjs-seeking .vjs-loading-spinner:before,
+.vjs-luxmty.vjs-waiting .vjs-loading-spinner:before {
+  animation:
+    vjs-spinner-spin 0.7s cubic-bezier(0.27, 0.28, 0.69, 0.68) infinite,
+    vjs-loading-spinner-fade 0.8s linear infinite;
+}
+
+.vjs-luxmty.vjs-seeking .vjs-loading-spinner:before,
+.vjs-luxmty.vjs-waiting .vjs-loading-spinner:before {
+  border-top-color: transparent;
+}
+
+/*uncomment next class if you want hide loading spinner when scrubbing*/
+/*.vjs-luxmty.vjs-scrubbing .vjs-loading-spinner {
+  display: none;
+}
+*/
+@keyframes vjs-spinner-show {
+  to {
+    visibility: visible;
+  }
+}
+@keyframes vjs-spinner-spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes vjs-loading-spinner-fade {
+  0% {
+    border-top-color: var(--spin-color-1);
+    border-bottom-color: var(--spin-color-2);
+  }
+  20% {
+    border-top-color: var(--spin-color-1);
+    border-bottom-color: var(--spin-color-2);
+  }
+  35% {
+    border-top-color: var(--spin-color-1);
+    border-bottom-color: var(--spin-color-2);
+  }
+  60% {
+    border-top-color: var(--spin-color-1);
+    border-bottom-color: var(--spin-color-2);
+  }
+  100% {
+    border-top-color: var(--spin-color-1);
+    border-bottom-color: var(--spin-color-2);
+  }
+}
+/*POSTER*/
+.vjs-poster {
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+}
+
+.vjs-poster img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: contain;
+  object-fit: contain;
+}
+
+/*SCROLLBAR*/
+.vjs-luxmty {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar) transparent;
+}
+
+.vjs-luxmty ul::-webkit-scrollbar {
+  width: 3.5px;
+}
+
+.vjs-luxmty ul::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar);
+}
+
+/*TITLE BAR*/
+.vjs-luxmty .vjs-title-bar {
+  position: absolute;
+  top: 0;
+  background: rgba(0, 0, 0, 0.9);
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  font-size: var(--fs-title-bar);
+  line-height: 1.8;
+  padding: 0.666em 0.63em 0.766em;
+  pointer-events: none;
+  transition:
+    all cubic-bezier(0.45, 0.44, 0.67, 0.66),
+    ease-in-out 0.5s;
+  width: 100%;
+  height: 100%;
+}
+
+.vjs-luxmty .vjs-error .vjs-title-bar {
+  display: none;
+}
+
+.vjs-luxmty .vjs-title-bar-title,
+.vjs-luxmty .vjs-title-bar-description {
+  line-height: 1.8;
+  margin: 0;
+  padding-left: 0.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vjs-luxmty .vjs-title-bar-title {
+  color: var(--title-bar);
+  font-weight: var(--fw-title-bar);
+  margin-bottom: 0;
+}
+
+.vjs-luxmty .vjs-title-bar-description {
+  color: var(--title-bar-descr);
+  font-weight: var(--fw-title-description);
+  font-size: var(--fs-title-description);
+}
+
+.vjs-luxmty.vjs-playing.vjs-user-inactive .vjs-title-bar {
+  background-color: transparent;
+  opacity: 0;
+  transform: translate(0, -4em);
+  transition:
+    all cubic-bezier(0.45, 0.44, 0.67, 0.66),
+    ease-in-out 0.5s;
+}
+
+/*TEXT TRACK SETTINGS - 移除字幕样式设置功能，只保留基础对话框结构*/
+.vjs-modal-dialog.vjs-text-track-settings {
+  display: none !important; /* 完全隐藏字幕样式设置对话框 */
+}
+
+.vjs-error .vjs-text-track-settings {
+  display: none;
+}
+
+/* 隐藏字幕菜单中的设置按钮 */
+.vjs-luxmty .vjs-texttrack-settings {
+  display: none !important;
+}
+
+/* 隐藏字幕设置相关的菜单项 */
+.vjs-luxmty .vjs-menu .vjs-texttrack-settings {
+  display: none !important;
+}
+
+/* 隐藏所有字幕设置相关元素 */
+.vjs-luxmty [class*="texttrack-settings"],
+.vjs-luxmty [class*="text-track-settings"] {
+  display: none !important;
+}
+
+/*TEXT TRACK DISPLAY*/
+.vjs-luxmty .vjs-text-track-display > div > div > div {
+  border-radius: 0.5em;
+  font-weight: var(--fw-captions-subs);
+  padding: 0 0.8em 0 0.8em !important;
+  display: inline-flex !important;
+  text-shadow:
+    0.5px 0.5px 9px rgb(0, 0, 0),
+    0.5px 0.5px 9px rgb(0, 0, 0),
+    0.5px 0.5px 9px rgb(0, 0, 0),
+    0.5px 0.5px 0.5px rgb(0, 0, 0),
+    0.5px 0.5px 0.5px rgb(0, 0, 0),
+    0.5px 0.5px 0.5px rgb(0, 0, 0);
+}
+
+.vjs-luxmty .vjs-text-track-display {
+  position: absolute;
+  bottom: 1em;
+  transform: translateY(-5em);
+  left: 0;
+  right: 0;
+  top: 0;
+  pointer-events: none;
+  transition:
+    all cubic-bezier(0.45, 0.44, 0.67, 0.66),
+    ease-in-out 0.5s;
+}
+
+.vjs-luxmty.vjs-user-inactive.vjs-playing .vjs-text-track-display {
+  bottom: 1em;
+  transform: translateY(-1.4em);
+}
+
+/*ADAPTIVE SECTION*/
+.vjs-luxmty.vjs-layout-small .vjs-audio-button,
+.vjs-luxmty.vjs-layout-small .vjs-remaining-time,
+.vjs-luxmty.vjs-layout-small .vjs-skip-backward-5,
+.vjs-luxmty.vjs-layout-small .vjs-skip-backward-10,
+.vjs-luxmty.vjs-layout-small .vjs-skip-backward-30,
+.vjs-luxmty.vjs-layout-small .vjs-skip-forward-5,
+.vjs-luxmty.vjs-layout-small .vjs-skip-forward-10,
+.vjs-luxmty.vjs-layout-small .vjs-skip-forward-30 {
+  display: none;
+}
+.vjs-luxmty.vjs-layout-x-small .vjs-audio-button,
+.vjs-luxmty.vjs-layout-x-small .vjs-skip-backward-5,
+.vjs-luxmty.vjs-layout-x-small .vjs-skip-backward-10,
+.vjs-luxmty.vjs-layout-x-small .vjs-skip-backward-30,
+.vjs-luxmty.vjs-layout-x-small .vjs-skip-forward-5,
+.vjs-luxmty.vjs-layout-x-small .vjs-skip-forward-10,
+.vjs-luxmty.vjs-layout-x-small .vjs-skip-forward-30,
+.vjs-luxmty.vjs-layout-x-small .vjs-time-divider,
+.vjs-luxmty.vjs-layout-x-small .vjs-duration,
+.vjs-luxmty.vjs-layout-x-small .vjs-remaining-time,
+.vjs-luxmty.vjs-layout-x-small .vjs-playback-rate,
+.vjs-luxmty.vjs-layout-x-small .vjs-subs-caps-button,
+.vjs-luxmty.vjs-layout-x-small .vjs-volume-control {
+  display: none;
+}
+.vjs-luxmty.vjs-layout-tiny .vjs-audio-button,
+.vjs-luxmty.vjs-layout-tiny .vjs-skip-backward-5,
+.vjs-luxmty.vjs-layout-tiny .vjs-skip-backward-10,
+.vjs-luxmty.vjs-layout-tiny .vjs-skip-backward-30,
+.vjs-luxmty.vjs-layout-tiny .vjs-skip-forward-5,
+.vjs-luxmty.vjs-layout-tiny .vjs-skip-forward-10,
+.vjs-luxmty.vjs-layout-tiny .vjs-skip-forward-30,
+.vjs-luxmty.vjs-layout-tiny .vjs-time-divider,
+.vjs-luxmty.vjs-layout-tiny .vjs-duration,
+.vjs-luxmty.vjs-layout-tiny .vjs-remaining-time,
+.vjs-luxmty.vjs-layout-tiny .vjs-picture-in-picture-control,
+.vjs-luxmty.vjs-layout-tiny .vjs-playback-rate,
+.vjs-luxmty.vjs-layout-tiny .vjs-subs-caps-button,
+.vjs-luxmty.vjs-layout-tiny .vjs-volume-control,
+.vjs-luxmty.vjs-layout-tiny .vjs-quality-selector,
+.vjs-luxmty.vjs-layout-tiny .vjs-hls-quality-selector,
+.vjs-luxmty.vjs-layout-tiny .vjs-quality-menu-wrapper {
+  display: none;
+}
+.vjs-luxmty.vjs-layout-x-small .vjs-progress-control,
+.vjs-luxmty.vjs-layout-tiny .vjs-progress-control {
+  display: flex;
+}
+.vjs-luxmty.vjs-layout-x-small .vjs-custom-control-spacer {
+  display: flex;
+  flex: 1 1 auto;
+}
+
+/*MOBILE LAYOUT*/
+.vjs-luxmty.vjs-layout-small .vjs-big-play-button {
+  font-size: 2.3em;
+}
+
+.vjs-luxmty.vjs-layout-small .vjs-control-bar {
+  height: 4.7em;
+}
+
+.vjs-luxmty.vjs-layout-small .vjs-menu-button-popup .vjs-menu {
+  bottom: 2.7em;
+}
+
+.vjs-luxmty.vjs-layout-small .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  bottom: 1.55em;
+}
+
+.vjs-luxmty.vjs-layout-small .vjs-loading-spinner {
+  width: 3.3em;
+  height: 3.3em;
+}
+
+.vjs-luxmty.vjs-layout-small .vjs-loading-spinner:before {
+  border-width: 0.38em;
+}
+
+.vjs-luxmty.vjs-layout-small .vjs-title-bar {
+  font-size: var(--fs-title-bar-mobile);
+}
+
+.vjs-luxmty.vjs-layout-small .vjs-text-track-display {
+  transform: translateY(-4.2em);
+}
+
+.vjs-luxmty.vjs-layout-small.vjs-user-inactive.vjs-playing .vjs-text-track-display {
+  transform: translateY(-0.5em);
+}
+
+/*SMALLER OLDER MOBILES LAYOUT*/
+.vjs-luxmty.vjs-layout-x-small .vjs-big-play-button,
+.vjs-luxmty.vjs-layout-tiny .vjs-big-play-button {
+  font-size: 1.9em;
+}
+
+.vjs-luxmty.vjs-layout-x-small .vjs-control-bar,
+.vjs-luxmty.vjs-layout-tiny .vjs-control-bar {
+  height: 4em;
+}
+
+.vjs-luxmty.vjs-layout-x-small .vjs-control {
+  width: 1.8rem;
+}
+
+.vjs-layout-x-small .vjs-button > .vjs-icon-placeholder:before {
+  font-size: 1.6em;
+}
+
+.vjs-luxmty.vjs-layout-x-small .vjs-time-control {
+  font-size: 0.9em;
+  width: auto;
+  height: auto;
+  padding: 0.12em 0.21em 0em 0.21em;
+}
+
+.vjs-luxmty.vjs-layout-x-small .vjs-progress-control {
+  width: 100%;
+}
+
+.vjs-luxmty.vjs-layout-x-small .vjs-menu-button-popup .vjs-menu,
+.vjs-luxmty.vjs-layout-tiny .vjs-menu-button-popup .vjs-menu {
+  bottom: 2em;
+}
+
+.vjs-luxmty.vjs-layout-x-small .vjs-menu-button-popup .vjs-menu .vjs-menu-content,
+.vjs-luxmty.vjs-layout-tiny .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  bottom: 1.55em;
+}
+
+.vjs-luxmty.vjs-layout-x-small .vjs-loading-spinner,
+.vjs-luxmty.vjs-layout-tiny .vjs-loading-spinner {
+  width: 3.3em;
+  height: 3.3em;
+}
+
+.vjs-luxmty.vjs-layout-x-small .vjs-loading-spinner:before,
+.vjs-luxmty.vjs-layout-tiny .vjs-loading-spinner:before {
+  border-width: 0.38em;
+}
+
+.vjs-luxmty.vjs-layout-x-small .vjs-title-bar {
+  font-size: 1.1em;
+}
+
+.vjs-luxmty.vjs-layout-tiny .vjs-title-bar {
+  font-size: 1.1em;
+}
+
+.vjs-luxmty.vjs-layout-x-small .vjs-text-track-display,
+.vjs-luxmty.vjs-layout-tiny .vjs-text-track-display {
+  transform: translateY(-3.7em);
+}
+
+.vjs-luxmty.vjs-layout-x-small.vjs-user-inactive.vjs-playing .vjs-text-track-display,
+.vjs-luxmty.vjs-layout-tiny.vjs-user-inactive.vjs-playing .vjs-text-track-display {
+  transform: translateY(-0.5em);
+}
+
+/*
+Designed By Emilio Salas
+(emiliosalasgzz@gmail.com),
+(https://www.github.com/EmilioSG11)
+(https://x.com/EmilioSGZ_)
+*/

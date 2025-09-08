@@ -1,0 +1,14 @@
+@config "../../tailwind.config.cjs"; /* ← adjust the path if needed */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 滚动条隐藏工具类 */
+@utility scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none !important;
+  }
+}
