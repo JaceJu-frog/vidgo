@@ -138,6 +138,23 @@ function getVideoSources(url: string): Array<{ src: string; type: string }> {
     // VP9 and VP8 fallbacks
     sources.push({ src: url, type: 'video/webm; codecs="vp9"' })
     sources.push({ src: url, type: 'video/webm; codecs="vp8"' })
+  } else if (baseMimeType === 'video/x-matroska') {
+    // For MKV containers - specific handling for Matroska format
+    if (hevcSupported) {
+      // HEVC (H.265) variants for MKV with different profiles and levels
+      sources.push({ src: url, type: 'video/x-matroska; codecs="hvc1.2.4.L150.B0"' }) // Main10 Profile, Level 5.0
+      sources.push({ src: url, type: 'video/x-matroska; codecs="hev1.2.4.L150.B0"' }) // Alternative HEVC format
+      sources.push({ src: url, type: 'video/x-matroska; codecs="hvc1.1.6.L120.B0"' }) // Main Profile, Level 4.0
+      sources.push({ src: url, type: 'video/x-matroska; codecs="hev1.1.6.L120.B0"' }) // Alternative format
+    }
+    if (av1Supported) {
+      sources.push({ src: url, type: 'video/x-matroska; codecs="av01.0.08M.08"' })
+    }
+    // H.264 in MKV container
+    sources.push({ src: url, type: 'video/x-matroska; codecs="avc1.64001F"' }) // High Profile
+    sources.push({ src: url, type: 'video/x-matroska; codecs="avc1.4D401F"' }) // Main Profile
+    // VP9 and VP8 fallbacks for MKV
+    sources.push({ src: url, type: 'video/x-matroska; codecs="vp9"' })
   } else {
     // For other container formats
     if (av1Supported) {
@@ -418,6 +435,55 @@ function showHotkeyHint(text: string) {
     hotkeyHintVisible.value = false
   }, 2000)
 }
+
+function showMediaError(message: string) {
+  // Create error overlay
+  const errorOverlay = document.createElement('div')
+  errorOverlay.style.cssText = `
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+  `
+  
+  const errorMessage = document.createElement('div')
+  errorMessage.innerHTML = `
+    <div style="background: rgba(220, 53, 69, 0.9); padding: 20px; border-radius: 8px; max-width: 400px;">
+      <div style="font-size: 18px; margin-bottom: 10px;">⚠️ 播放错误</div>
+      <div style="margin-bottom: 15px;">${message}</div>
+      <div style="font-size: 14px; color: rgba(255,255,255,0.8);">
+        建议尝试使用其他浏览器或转换视频格式为MP4
+      </div>
+    </div>
+  `
+  
+  errorOverlay.appendChild(errorMessage)
+  
+  // Add to video container
+  const videoContainer = player?.el()?.parentElement
+  if (videoContainer) {
+    videoContainer.style.position = 'relative'
+    videoContainer.appendChild(errorOverlay)
+    
+    // Remove error after 10 seconds
+    setTimeout(() => {
+      if (errorOverlay.parentNode) {
+        errorOverlay.parentNode.removeChild(errorOverlay)
+      }
+    }, 10000)
+  }
+}
 // Background play functionality
 function setupBackgroundPlay() {
   if (!player || !('mediaSession' in navigator)) {
@@ -637,20 +703,57 @@ onMounted(async () => {
   player.src(sources)
 
   // Add error handling for source loading
+  let errorRetryCount = 0
+  const maxRetries = 3
+  
   player.on('error', () => {
     const playerError = player?.error()
     if (playerError) {
       console.error('[VideoPlayer] Video.js error:', {
         code: playerError.code,
         message: playerError.message,
-        originalError: playerError
+        originalError: playerError,
+        retryCount: errorRetryCount
       })
       
-      // Try to recover by attempting simpler MIME types
-      if (playerError.code === 4) { // MEDIA_ERR_SRC_NOT_SUPPORTED
-        console.log('[VideoPlayer] Attempting source recovery with basic MIME type')
+      // Try progressive fallback strategies for unsupported media
+      if (playerError.code === 4 && errorRetryCount < maxRetries) { // MEDIA_ERR_SRC_NOT_SUPPORTED
+        errorRetryCount++
+        console.log(`[VideoPlayer] Attempting source recovery ${errorRetryCount}/${maxRetries}`)
+        
         const basicMimeType = getMediaMimeType(props.src)
-        player?.src([{ src: props.src, type: basicMimeType }])
+        let fallbackSources: Array<{ src: string; type: string }> = []
+        
+        if (errorRetryCount === 1) {
+          // First retry: basic MIME type without codec specification
+          fallbackSources = [
+            { src: props.src, type: basicMimeType },
+            { src: props.src, type: 'video/mp4' }, // Universal fallback
+            { src: props.src, type: 'video/webm' }
+          ]
+        } else if (errorRetryCount === 2 && basicMimeType === 'video/x-matroska') {
+          // Second retry for MKV: try as MP4 (some servers misidentify containers)
+          fallbackSources = [
+            { src: props.src, type: 'video/mp4; codecs="hvc1.1.6.L93.B0"' },
+            { src: props.src, type: 'video/mp4; codecs="avc1.64001F"' },
+            { src: props.src, type: 'video/mp4' }
+          ]
+        } else if (errorRetryCount === 3) {
+          // Final retry: completely generic
+          fallbackSources = [
+            { src: props.src, type: 'application/octet-stream' },
+            { src: props.src, type: '' } // Let browser decide
+          ]
+        }
+        
+        if (fallbackSources.length > 0) {
+          console.log('[VideoPlayer] Trying fallback sources:', fallbackSources)
+          player?.src(fallbackSources)
+        }
+      } else if (playerError.code === 4 && errorRetryCount >= maxRetries) {
+        // Show user-friendly error message
+        console.error('[VideoPlayer] All source recovery attempts failed')
+        showMediaError('这个视频文件无法播放。可能是编码格式不被浏览器支持，或文件已损坏。')
       }
     }
   })
