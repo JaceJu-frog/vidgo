@@ -1,7 +1,7 @@
 // 前端会编译后与后端运行在同一台主机，同一端口，所以生产中使用${window.location.port}
-// export const BACKEND = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
+export const BACKEND = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
 // 开发中前后端端口不统一，使用默认的8000端口
-export const BACKEND = `${window.location.protocol}//${window.location.hostname}:8000`
+// export const BACKEND = `${window.location.protocol}//${window.location.hostname}:8000`
 
 // User-defined hidden categories API functions
 export async function loadUserHiddenCategories(): Promise<{
@@ -108,10 +108,17 @@ export function saveHiddenCategories(hiddenCategories: number[]): void {
 
 export interface ConfigData {
   DEFAULT: {
-    api_key: string
-    base_url: string
-    selected_model: string
+    selected_model_provider: string
+    enable_thinking: string
     use_proxy: string
+    deepseek_api_key: string
+    deepseek_base_url: string
+    glm_api_key: string
+    glm_base_url: string
+    openai_api_key: string
+    openai_base_url: string
+    qwen_api_key: string
+    qwen_base_url: string
   }
   'Video watch': {
     raw_language: string
@@ -171,10 +178,18 @@ export interface ConfigData {
 
 export interface FrontendSettings {
   // Model settings
-  apiKey: string
-  baseUrl: string
-  selectedModel: string
+  selectedModelProvider: string
+  enableThinking: boolean
   useProxy: boolean
+  // Provider-specific API keys
+  deepseekApiKey: string
+  deepseekBaseUrl: string
+  openaiApiKey: string
+  openaiBaseUrl: string
+  glmApiKey: string
+  glmBaseUrl: string
+  qwenApiKey: string
+  qwenBaseUrl: string
   // Interface settings
   rawLanguage: string
   hiddenCategories: number[] // 新增：隐藏的分类ID列表
@@ -251,9 +266,18 @@ export async function loadConfig(): Promise<FrontendSettings> {
     // Convert backend format to frontend format
     return {
       // Model settings
-      apiKey: data.DEFAULT?.api_key || '',
-      baseUrl: data.DEFAULT?.base_url || '',
-      selectedModel: data.DEFAULT?.selected_model || 'deepseek-chat',
+      selectedModelProvider: data.DEFAULT?.selected_model_provider || 'deepseek',
+      enableThinking: data.DEFAULT?.enable_thinking === 'true',
+      // Provider-specific API keys
+      deepseekApiKey: data.DEFAULT?.deepseek_api_key || '',
+      deepseekBaseUrl: data.DEFAULT?.deepseek_base_url || 'https://api.deepseek.com',
+      openaiApiKey: data.DEFAULT?.openai_api_key || '',
+      openaiBaseUrl: data.DEFAULT?.openai_base_url || 'https://api.chatanywhere.tech/v1',
+      glmApiKey: data.DEFAULT?.glm_api_key || '',
+      glmBaseUrl: data.DEFAULT?.glm_base_url || 'https://api.deepseek.com',
+      qwenApiKey: data.DEFAULT?.qwen_api_key || '',
+      qwenBaseUrl:
+        data.DEFAULT?.qwen_base_url || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
       useProxy: data.DEFAULT?.use_proxy === 'true',
       // Interface settings
       rawLanguage: data['Video watch']?.raw_language || 'zh',
@@ -336,9 +360,16 @@ export async function saveConfig(settings: FrontendSettings): Promise<void> {
     // Convert frontend format to backend format
     const configData: ConfigData = {
       DEFAULT: {
-        api_key: settings.apiKey,
-        base_url: settings.baseUrl,
-        selected_model: settings.selectedModel,
+        selected_model_provider: settings.selectedModelProvider,
+        enable_thinking: settings.enableThinking.toString(),
+        deepseek_api_key: settings.deepseekApiKey,
+        deepseek_base_url: settings.deepseekBaseUrl,
+        openai_api_key: settings.openaiApiKey,
+        openai_base_url: settings.openaiBaseUrl,
+        glm_api_key: settings.glmApiKey,
+        glm_base_url: settings.glmBaseUrl,
+        qwen_api_key: settings.qwenApiKey,
+        qwen_base_url: settings.qwenBaseUrl,
         use_proxy: settings.useProxy.toString(),
       },
       'Video watch': {

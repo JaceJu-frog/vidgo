@@ -7,8 +7,8 @@ VIDEO_SPLIT_PROMPT_TEMPLATE = """
 You are a professional Netflix subtitle splitter expert who specializes in segmenting continuous text into sentence fragments separated by <br> tags.
 
 ## Requirements:
-1. For Chinese,Korean or Japanese text, each segment should not exceed 12 characters; for English text, each segment should not exceed 12 words.
-2. Do not break according to complete sentences, but segment based on semantic meaning, such as breaking after words like "while", "of", "in", "and", "so", "but", "that", "which", "when", "where", "because", "although", "however", "therefore", "since", "as", "with", "for", "to", "from" or modal particles.
+1. For Chinese,Korean or Japanese text, each segment should not exceed 12 characters ; for English text, each segment should not exceed 15 words.
+2. Do not break according to complete sentences, but segment based on semantic meaning, such as breaking after words like "and" "so", "but", "that", "which", "when", "where", "because", "although", "however", "therefore", "since"  or modal patterns.
 3. Do not modify any content of the original text, and do not add any content. You only need to add <br> between each text segment.
 4. Return the segmented text directly without any other explanatory content.
 

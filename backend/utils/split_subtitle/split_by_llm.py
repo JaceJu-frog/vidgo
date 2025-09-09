@@ -11,7 +11,6 @@ from utils.split_subtitle.prompt import VIDEO_SPLIT_PROMPT_TEMPLATE
 
 # Add the project root to the path to import from video.views.set_setting
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
-from video.views.set_setting import load_all_settings
 
 logger = logging.getLogger('subtitle_split')
 if not logger.handlers:
@@ -35,25 +34,9 @@ if not logger.handlers:
     logger.addHandler(file_handler)
     logger.setLevel(logging.DEBUG)
 
-# 加载配置
-# Load all settings and optionally disable proxies
-settings = load_all_settings()
-use_proxy = settings.get('DEFAULT', {}).get('use_proxy', 'true').lower() == 'true'
-if not use_proxy:
-    # disable HTTP(S) proxies for requests
-    os.environ.pop('http_proxy', None)
-    os.environ.pop('https_proxy', None)
 
-# 获取 API 配置
-api_key = settings.get('DEFAULT', {}).get('api_key', '')
-base_url = settings.get('DEFAULT', {}).get('base_url', 'https://api.deepseek.com')
 
-# 常量定义
-MODEL = "deepseek-chat"
 CACHE_DIR = "cache"
-
-# 初始化OpenAI客户端
-client = openai.OpenAI(api_key=api_key, base_url=base_url)
 
 
 
@@ -90,7 +73,13 @@ def set_cache(text: str, model: str, result: List[str]) -> None:
     except IOError:
         pass
 
-def split_by_llm(text: str, use_cache: bool = False,max_length:int = 20,language:str= "en") -> List[str]:
+def split_by_llm(text: str, 
+                 use_cache: bool = False,
+                 max_length:int = 20,
+                 language:str= "en",
+                 api_key="sk-your_api_key",
+                 base_url="https://api.deepseek.com",
+                 model="deepseek-chat") -> List[str]:
     """
     使用LLM进行文本断句
     """
@@ -100,16 +89,18 @@ def split_by_llm(text: str, use_cache: bool = False,max_length:int = 20,language
     #         print(f"[+] 从缓存中获取结果: {cached_result}")
     #         return cached_result
     word_limit=30 # max 
+    # 初始化OpenAI客户端
+    client = openai.OpenAI(api_key=api_key, base_url=base_url)
     SYSTEM_PROMPT = f"Use <br> for the split of paragraph"
     total_word_count = count_words(text)
     logger.info(f"total_word_count{total_word_count}")
     prompt = VIDEO_SPLIT_PROMPT_TEMPLATE.format(
         sentence=text
     )
-    
+    print("using model:",model)
     try:
         response = client.chat.completions.create(
-            model=MODEL,
+            model=model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt}
@@ -123,7 +114,7 @@ def split_by_llm(text: str, use_cache: bool = False,max_length:int = 20,language
         split_text = json_data[f'split']
         split_result = [segment.strip() for segment in split_text.split("<br>") if segment.strip()] # 将单个段落拆分为句子（各语言通用），通过strip去除文本两端的空格
         
-        set_cache(text, MODEL, split_result)
+        set_cache(text, model, split_result)
         return split_result
     except Exception as e:
         print(f"[!] 请求LLM失败: {e}")

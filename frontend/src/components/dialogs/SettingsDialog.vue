@@ -64,14 +64,14 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('apiKey') }}</label>
               <div class="flex items-center space-x-2">
                 <el-input
-                  v-model="settings.apiKey"
+                  v-model="currentApiKey"
                   type="password"
                   show-password
                   :placeholder="t('enterApiKey')"
                   class="flex-1"
                 />
                 <button
-                  @click="copyToClipboard(settings.apiKey)"
+                  @click="copyToClipboard(currentApiKey)"
                   class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm text-gray-700 whitespace-nowrap"
                 >
                   {{ t('copy') }}
@@ -82,7 +82,7 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('baseUrl') }}</label>
               <input
-                v-model="settings.baseUrl"
+                v-model="currentBaseUrl"
                 type="url"
                 class="w-full p-2 border border-gray-300 rounded-md"
                 placeholder="输入API基础URL"
@@ -90,13 +90,17 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">模型选择</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">模型提供商选择</label>
               <select
-                v-model="settings.selectedModel"
+                v-model="settings.selectedModelProvider"
                 class="w-full p-2 border border-gray-300 rounded-md"
               >
-                <option v-for="model in modelOptions" :key="model.value" :value="model.value">
-                  {{ model.label }}
+                <option
+                  v-for="provider in providerOptions"
+                  :key="provider.value"
+                  :value="provider.value"
+                >
+                  {{ provider.label }}
                 </option>
               </select>
             </div>
@@ -106,6 +110,13 @@
                 active-text="使用代理"
                 inactive-text="不使用代理"
               />
+              <el-switch
+                v-model="settings.enableThinking"
+                active-text="启用思考"
+                inactive-text="普通模型"
+              />
+            </div>
+            <div class="flex justify-end">
               <button
                 @click="testLLMConnection"
                 :disabled="connectionTesting"
@@ -652,7 +663,7 @@
               </select>
               <p class="mt-2 text-sm text-gray-500">选择转录模型类型：本地或远程</p>
             </div>
-            
+
             <!-- Local Model Selection -->
             <div v-if="settings.transcriptionMode === 'local'">
               <div class="flex justify-between items-center mb-2">
@@ -668,32 +679,45 @@
                 v-model="settings.fwsrModel"
                 class="w-full p-2 border border-gray-300 rounded-md"
               >
-                <option
-                  v-for="model in availableModels"
-                  :key="model.name"
-                  :value="model.name"
-                >
+                <option v-for="model in availableModels" :key="model.name" :value="model.name">
                   {{ model.name }} ({{ model.size }})
                   {{ model.downloaded ? '✅' : model.downloading ? '⏳' : '⬇️' }}
                 </option>
               </select>
               <p class="mt-2 text-sm text-gray-500">选择用于字幕生成的Whisper模型</p>
-              
+
               <!-- Warning for distil-large-v3 -->
-              <div v-if="settings.fwsrModel === 'distil-large-v3'" class="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-md">
+              <div
+                v-if="settings.fwsrModel === 'distil-large-v3'"
+                class="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-md"
+              >
                 <div class="flex items-start">
-                  <svg class="w-5 h-5 text-orange-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                  <svg
+                    class="w-5 h-5 text-orange-400 mt-0.5 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                      clip-rule="evenodd"
+                    ></path>
                   </svg>
                   <div>
                     <p class="text-sm font-medium text-orange-800">注意：英文专用模型</p>
-                    <p class="text-sm text-orange-700 mt-1">distil-large-v3 是英文优化的蒸馏模型，仅支持英文转录。如需中文转录，建议使用 large-v3 或 medium 模型。</p>
+                    <p class="text-sm text-orange-700 mt-1">
+                      distil-large-v3 是英文优化的蒸馏模型，仅支持英文转录。如需中文转录，建议使用
+                      large-v3 或 medium 模型。
+                    </p>
                   </div>
                 </div>
               </div>
-              
+
               <!-- Model Download Section -->
-              <div v-if="!isCurrentModelDownloaded" class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+              <div
+                v-if="!isCurrentModelDownloaded"
+                class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md"
+              >
                 <div class="flex items-center justify-between mb-2">
                   <span class="text-sm font-medium text-yellow-800">
                     模型 "{{ settings.fwsrModel }}" 尚未下载
@@ -715,15 +739,21 @@
                     </button>
                   </div>
                 </div>
-                <div v-if="isDownloading" class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                <div
+                  v-if="isDownloading"
+                  class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded"
+                >
                   <p class="text-sm text-blue-700">⏳ 模型正在后台下载，请耐心等待...</p>
                 </div>
-                <div v-if="modelSizeInfo" class="mt-2 p-2 bg-gray-50 border border-gray-200 rounded">
+                <div
+                  v-if="modelSizeInfo"
+                  class="mt-2 p-2 bg-gray-50 border border-gray-200 rounded"
+                >
                   <p class="text-sm text-gray-700">📁 当前模型大小: {{ modelSizeInfo }}</p>
                 </div>
               </div>
             </div>
-            
+
             <div v-if="settings.transcriptionMode === 'remote'">
               <label class="block text-sm font-medium text-gray-700 mb-2">主要转录引擎选择</label>
               <select
@@ -875,7 +905,9 @@
                 </div>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('baseUrl') }}</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">{{
+                  t('baseUrl')
+                }}</label>
                 <input
                   v-model="settings.transcriptionOpenaiBaseUrl"
                   type="url"
@@ -886,14 +918,19 @@
             </div>
 
             <!-- Remote VidGo Service Settings -->
-            <div v-if="needsRemoteVidGoConfig" class="space-y-4 border border-gray-200 rounded-lg p-4">
+            <div
+              v-if="needsRemoteVidGoConfig"
+              class="space-y-4 border border-gray-200 rounded-lg p-4"
+            >
               <h4 class="text-sm font-medium text-gray-800">远程VidGo字幕服务配置</h4>
               <p class="text-sm text-gray-600 mb-4">
                 用户可在高性能主机中部署VidGo实例，并通过IP/域名链接，调用后端的字幕识别服务。
               </p>
-              
+
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">服务器地址 (IP/域名)</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >服务器地址 (IP/域名)</label
+                >
                 <input
                   v-model="settings.remoteVidGoHost"
                   type="text"
@@ -915,11 +952,7 @@
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">SSL设置</label>
                 <label class="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    v-model="settings.remoteVidGoUseSsl"
-                    class="sr-only"
-                  />
+                  <input type="checkbox" v-model="settings.remoteVidGoUseSsl" class="sr-only" />
                   <div
                     :class="[
                       'w-11 h-6 rounded-full transition-colors',
@@ -1058,7 +1091,12 @@ import {
 } from '@/composables/ConfigAPI'
 import { ElMessage } from 'element-plus'
 import { useSubtitleStyle } from '@/composables/SubtitleStyle'
-import { loadWhisperModels, downloadWhisperModel, getModelDownloadProgress, getModelSize, type WhisperModel } from '@/composables/ConfigAPI'
+import {
+  loadWhisperModels,
+  downloadWhisperModel,
+  getModelSize,
+  type WhisperModel,
+} from '@/composables/ConfigAPI'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
@@ -1077,7 +1115,7 @@ const emit = defineEmits<{
 // 使用字幕样式composable
 const { updateSubtitleSettings, updateForeignSubtitleSettings } = useSubtitleStyle()
 
-// i18n functionality  
+// i18n functionality
 const { t } = useI18n()
 
 // 字幕类型选择
@@ -1107,6 +1145,73 @@ const bottomDistanceProxy = computed({
       settings.bottomDistance = value
     } else {
       settings.foreignBottomDistance = value
+    }
+  },
+})
+
+// 当前模型提供商的API密钥和基础URL计算属性
+const currentApiKey = computed({
+  get() {
+    switch (settings.selectedModelProvider) {
+      case 'deepseek':
+        return settings.deepseekApiKey
+      case 'openai':
+        return settings.openaiApiKey
+      case 'glm':
+        return settings.glmApiKey
+      case 'qwen':
+        return settings.qwenApiKey
+      default:
+        return settings.deepseekApiKey
+    }
+  },
+  set(value: string) {
+    switch (settings.selectedModelProvider) {
+      case 'deepseek':
+        settings.deepseekApiKey = value
+        break
+      case 'openai':
+        settings.openaiApiKey = value
+        break
+      case 'glm':
+        settings.glmApiKey = value
+        break
+      case 'qwen':
+        settings.qwenApiKey = value
+        break
+    }
+  },
+})
+
+const currentBaseUrl = computed({
+  get() {
+    switch (settings.selectedModelProvider) {
+      case 'deepseek':
+        return settings.deepseekBaseUrl
+      case 'openai':
+        return settings.openaiBaseUrl
+      case 'glm':
+        return settings.glmBaseUrl
+      case 'qwen':
+        return settings.qwenBaseUrl
+      default:
+        return settings.deepseekBaseUrl
+    }
+  },
+  set(value: string) {
+    switch (settings.selectedModelProvider) {
+      case 'deepseek':
+        settings.deepseekBaseUrl = value
+        break
+      case 'openai':
+        settings.openaiBaseUrl = value
+        break
+      case 'glm':
+        settings.glmBaseUrl = value
+        break
+      case 'qwen':
+        settings.qwenBaseUrl = value
+        break
     }
   },
 })
@@ -1219,10 +1324,11 @@ const languageOptions = [
   { label: 'English', value: 'en' },
 ]
 
-const modelOptions = [
-  { label: 'DeepSeek-Chat', value: 'deepseek-chat' },
-  { label: 'DeepSeek-Reasoner', value: 'deepseek-reasoner' },
-  { label: 'GPT-4o', value: 'gpt-4o' },
+const providerOptions = [
+  { label: 'DeepSeek', value: 'deepseek' },
+  { label: 'OpenAI', value: 'openai' },
+  { label: 'GLM', value: 'glm' },
+  { label: 'Qwen', value: 'qwen' },
 ]
 
 const transcriptionEngines = [
@@ -1235,10 +1341,18 @@ const transcriptionEngines = [
 
 const settings = reactive<FrontendSettings>({
   // Model settings
-  apiKey: 'sk-17047f89de904759a241f4086bd5a9bf',
-  baseUrl: 'https://api.deepseek.com',
-  selectedModel: 'deepseek-chat',
-  useProxy: true,
+  selectedModelProvider: 'deepseek',
+  enableThinking: true,
+  useProxy: false,
+  // Provider-specific API keys
+  deepseekApiKey: 'sk-17047f89de904759a241f4086bd5a9bf',
+  deepseekBaseUrl: 'https://api.deepseek.com',
+  openaiApiKey: 'sk-qTbd1AR4oMuP71ziRngmk3i0djrWVfLtuisvYKCH5B9jLz9g',
+  openaiBaseUrl: 'https://api.chatanywhere.tech/v1',
+  glmApiKey: 'sk-17047f89de904759a241f4086bd5a9bf',
+  glmBaseUrl: 'https://api.deepseek.com',
+  qwenApiKey: 'sk-944471ea4aef486ca2a82b2adf26c0cc',
+  qwenBaseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
   // Interface settings
   rawLanguage: 'zh',
   hiddenCategories: [],
@@ -1331,7 +1445,7 @@ const needsRemoteVidGoConfig = computed(() => {
 
 // Model management computed properties
 const isCurrentModelDownloaded = computed(() => {
-  const currentModel = availableModels.value.find(model => model.name === settings.fwsrModel)
+  const currentModel = availableModels.value.find((model) => model.name === settings.fwsrModel)
   return currentModel?.downloaded || false
 })
 
@@ -1354,9 +1468,11 @@ const checkModelSize = async (modelName: string) => {
   try {
     isCheckingSize.value = true
     const sizeData = await getModelSize(modelName)
-    
+
     if (sizeData.exists) {
-      ElMessage.success(`模型 ${modelName} 当前大小: ${sizeData.size_human} (${sizeData.file_count} 个文件)`)
+      ElMessage.success(
+        `模型 ${modelName} 当前大小: ${sizeData.size_human} (${sizeData.file_count} 个文件)`,
+      )
       modelSizeInfo.value = `${sizeData.size_human} (${sizeData.file_count} files)`
     } else {
       ElMessage.info(`模型 ${modelName} 文件夹不存在`)
@@ -1374,16 +1490,16 @@ const downloadModel = async (modelName: string) => {
   try {
     isDownloading.value = true
     downloadProgress.value = 0
-    
+
     await downloadWhisperModel(modelName)
     ElMessage.success(`开始下载模型 ${modelName}`)
-    
+
     // Simple polling without progress estimation
     const pollInterval = setInterval(async () => {
       try {
         const modelData = await loadWhisperModels()
-        const model = modelData.models.find(m => m.name === modelName)
-        
+        const model = modelData.models.find((m) => m.name === modelName)
+
         if (model?.downloaded) {
           clearInterval(pollInterval)
           isDownloading.value = false
@@ -1394,13 +1510,15 @@ const downloadModel = async (modelName: string) => {
         console.error('Error polling download status:', error)
       }
     }, 3000) // Poll every 3 seconds
-    
+
     // Set a timeout to stop polling after 30 minutes
-    setTimeout(() => {
-      clearInterval(pollInterval)
-      isDownloading.value = false
-    }, 30 * 60 * 1000)
-    
+    setTimeout(
+      () => {
+        clearInterval(pollInterval)
+        isDownloading.value = false
+      },
+      30 * 60 * 1000,
+    )
   } catch (error) {
     console.error('Failed to download model:', error)
     ElMessage.error(`下载模型失败: ${error instanceof Error ? error.message : 'Unknown error'}`)
@@ -1507,9 +1625,18 @@ const saveSettings = async () => {
 const resetSettings = () => {
   Object.assign(settings, {
     // Model settings
-    apiKey: 'sk-17047f89de904759a241f4086bd5a9bf',
-    baseUrl: 'https://api.deepseek.com',
-    selectedModel: 'deepseek-chat',
+    selectedModelProvider: 'deepseek',
+    enableThinking: true,
+    useProxy: false,
+    // Provider-specific API keys
+    deepseekApiKey: '',
+    deepseekBaseUrl: 'https://api.deepseek.com',
+    openaiApiKey: '',
+    openaiBaseUrl: 'https://api.chatanywhere.tech/v1',
+    glmApiKey: '',
+    glmBaseUrl: 'https://api.deepseek.com',
+    qwenApiKey: '',
+    qwenBaseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     // Interface settings
     rawLanguage: 'zh',
     hiddenCategories: [],
@@ -1567,10 +1694,17 @@ const connectionTesting = ref(false)
 const testLLMConnection = async () => {
   connectionTesting.value = true
   try {
+    // 先保存当前设置，确保后端能读取到最新的配置
+    await saveConfig(settings)
+    ElMessage.success('设置已保存，开始测试连接...')
+    
+    // 稍等片刻让后端加载新配置
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
     const res = await fetch(`${BACKEND}/api/llm-test/`, { credentials: 'include' })
     const data = await res.json()
     if (data.success) {
-      ElMessage.success(`Response: ${data.response}`)
+      ElMessage.success(`测试成功: ${data.response}`)
     } else {
       ElMessage.error(`测试失败: ${data.error}`)
     }

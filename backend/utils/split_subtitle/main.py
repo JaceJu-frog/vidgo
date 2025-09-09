@@ -433,6 +433,8 @@ def determine_num_segments(word_count: int, threshold: int = 500) -> int:
 #     final_asr_data.to_srt(save_path=save_path)
 #     print(f"[+] 已完成srt文件合并")
 
+from video.views.set_setting import load_all_settings
+
 from typing import Callable, List
 def optimise_srt(
     srt_path: str,
@@ -440,6 +442,19 @@ def optimise_srt(
     num_threads: int = FIXED_NUM_THREADS,
     progress_cb: Callable[[float], None] | None = None,   # 0.0‒1.0 之间
 ) -> None:
+    settings = load_all_settings()
+    use_proxy = settings.get('DEFAULT', {}).get('use_proxy', 'true').lower() == 'true'
+    if not use_proxy:
+        # disable HTTP(S) proxies for requests
+        os.environ.pop('http_proxy', None)
+        os.environ.pop('https_proxy', None)
+    from utils.llm_engines import ENGINES
+    # 获取 API 配置
+    selected_model_provider = settings.get('DEFAULT', {}).get('selected_model_provider', 'deepseek')
+    api_key = settings.get('DEFAULT', {}).get(f'{selected_model_provider}_api_key', '')
+    base_url = settings.get('DEFAULT', {}).get(f'{selected_model_provider}_base_url', 'https://api.deepseek.com')
+    enable_thinking = settings.get('DEFAULT', {}).get('enable_thinking', 'true')
+    model = ENGINES[selected_model_provider]["thinking" if enable_thinking == 'true' else "normal"]
     """
     · 将 用于优化字幕。
     · 增加 progress_cb 回调，用于上报阶段内进度（0‑1）
@@ -478,7 +493,7 @@ def optimise_srt(
     # ── 10‑85 %： 多线程执行 split_by_llm 获取句子列表 ─────────────────
     def process_segment(asr_data_part):
         part_txt = asr_data_part.to_txt().replace("\n", "")
-        sentences = split_by_llm(part_txt, use_cache=True)
+        sentences = split_by_llm(part_txt, use_cache=True,api_key=api_key,model=model,base_url=base_url)
         print(f"[+] 分段的句子提取完成，共 {len(sentences)} 句")
         return sentences
     

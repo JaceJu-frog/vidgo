@@ -18,9 +18,17 @@ def _ensure_ini():
     if not os.path.exists(SETTINGS_FILE):
         cfg = configparser.ConfigParser(interpolation=None)
         cfg['DEFAULT'] = {
-            'api_key': 'sk-17047f89de904759a241f4086bd5a9bf',
-            'base_url': 'https://api.deepseek.com',
-            'use_proxy': 'true'
+            'selected_model_provider': 'deepseek',
+            'enable_thinking': 'true',
+            'use_proxy': 'false',
+            'deepseek_api_key': 'sk-17047f89de904759a241f4086bd5a9bf',
+            'deepseek_base_url': 'https://api.deepseek.com',
+            'glm_api_key': 'sk-17047f89de904759a241f4086bd5a9bf',
+            'glm_base_url': 'https://api.deepseek.com',
+            'openai_api_key': 'sk-qTbd1AR4oMuP71ziRngmk3i0djrWVfLtuisvYKCH5B9jLz9g',
+            'openai_base_url': 'https://api.chatanywhere.tech/v1',
+            'qwen_api_key': 'sk-944471ea4aef486ca2a82b2adf26c0cc',
+            'qwen_base_url': 'https://dashscope.aliyuncs.com/compatible-mode/v1'
         }
         cfg['Video watch'] = {
             'raw_language': 'zh'
@@ -152,8 +160,26 @@ class ConfigAPIView(View):
             
             # Update OpenAI client if API settings changed
             if 'DEFAULT' in settings_dict:
-                api_key = settings_dict['DEFAULT'].get('api_key', '')
-                base_url = settings_dict['DEFAULT'].get('base_url', '')
+                cfg = settings_dict['DEFAULT']
+                selected_provider = cfg.get('selected_model_provider', 'deepseek')
+                
+                # Get provider-specific API key and base URL
+                if selected_provider == 'deepseek':
+                    api_key = cfg.get('deepseek_api_key', '')
+                    base_url = cfg.get('deepseek_base_url', 'https://api.deepseek.com')
+                elif selected_provider == 'openai':
+                    api_key = cfg.get('openai_api_key', '')
+                    base_url = cfg.get('openai_base_url', 'https://api.openai.com/v1')
+                elif selected_provider == 'glm':
+                    api_key = cfg.get('glm_api_key', '')
+                    base_url = cfg.get('glm_base_url', 'https://open.bigmodel.cn/api/paas/v4')
+                elif selected_provider == 'qwen':
+                    api_key = cfg.get('qwen_api_key', '')
+                    base_url = cfg.get('qwen_base_url', 'https://dashscope.aliyuncs.com/compatible-mode/v1')
+                else:
+                    api_key = cfg.get('deepseek_api_key', '')
+                    base_url = cfg.get('deepseek_base_url', 'https://api.deepseek.com')
+                
                 _init_client(api_key, base_url)
             
             return JsonResponse({'success': True, 'message': 'Settings updated successfully'})
@@ -212,13 +238,40 @@ class LLMTestAPIView(View):
             # Load current settings and initialize client
             settings_data = load_all_settings()
             cfg = settings_data.get('DEFAULT', {})
-            api_key = cfg.get('api_key', '')
-            base_url = cfg.get('base_url', '')
+            
+            # Get selected model provider
+            selected_provider = cfg.get('selected_model_provider', 'deepseek')
+            
+            # Get provider-specific API key and base URL
+            if selected_provider == 'deepseek':
+                api_key = cfg.get('deepseek_api_key', '')
+                base_url = cfg.get('deepseek_base_url', 'https://api.deepseek.com')
+                model = 'deepseek-chat'
+            elif selected_provider == 'openai':
+                api_key = cfg.get('openai_api_key', '')
+                base_url = cfg.get('openai_base_url', 'https://api.openai.com/v1')
+                model = 'gpt-4o'
+            elif selected_provider == 'glm':
+                api_key = cfg.get('glm_api_key', '')
+                base_url = cfg.get('glm_base_url', 'https://open.bigmodel.cn/api/paas/v4')
+                model = 'glm-4-plus'
+            elif selected_provider == 'qwen':
+                api_key = cfg.get('qwen_api_key', '')
+                base_url = cfg.get('qwen_base_url', 'https://dashscope.aliyuncs.com/compatible-mode/v1')
+                model = 'qwen-plus'
+            else:
+                # Default to deepseek
+                api_key = cfg.get('deepseek_api_key', '')
+                base_url = cfg.get('deepseek_base_url', 'https://api.deepseek.com')
+                model = 'deepseek-chat'
+            
+            if not api_key or not base_url:
+                return JsonResponse({'success': False, 'error': f'API key or base URL not configured for provider: {selected_provider}'}, status=400)
+            
             _init_client(api_key, base_url)
-            # Determine model to use
-            model = cfg.get('selected_model', '')
+            
             # Send test prompt
-            prompt = 'Hello, ai'
+            prompt = 'Hello, please respond with "Connection successful!"'
             print(f'Sending test prompt to model {model} at {base_url}')
             response = client.chat.completions.create(
                 model=model,

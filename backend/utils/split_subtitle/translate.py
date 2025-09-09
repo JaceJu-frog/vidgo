@@ -51,17 +51,17 @@ def get_faithful_prompt(source_lang: str, target_lang: str, previous_context: st
 
   {{
     "1": {{
-      "original": "All of you know Andrew Ng as a famous computer science professor at Stanford.",
-      "direct": "你们都知道吴恩达是斯坦福大学著名的计算机科学教授。"
+      "original": "An example sentence in the source language.",
+      "direct": "The corresponding faithful translation in the target language."
     }},
     "2": {{
-      "original": "He was really early on in the development of neural networks with GPUs.",
-      "direct": "他在使用GPU开发神经网络方面起步很早。"
+      "original": "Another example subtitle line.",
+      "direct": "Its faithful translation."
     }}
   }}
 
-  Note: Start you answer with ```json and end with ```, do not add any other text.
 """
+#   Note: Start you answer with ```json and end with ```, do not add any other text.
 
 def get_free_prompt(source_lang: str, target_lang: str, previous_context: str = "", next_context: str = "") -> str:
     """生成意译阶段的提示模板"""
@@ -109,6 +109,7 @@ def get_free_prompt(source_lang: str, target_lang: str, previous_context: str = 
     - Aim for contextual smoothness and naturalness, conforming to {target_name} expression habits
     - Ensure it's easy for {target_name} audience to understand and accept
     - Adapt the language style to match the theme (e.g., use casual language for tutorials, professional terminology for technical content, formal language for documentaries)
+    - Do not abridge the translation; instead, expand when necessary. Conciseness should be treated as a secondary criterion, while the primary standard is to fully cover the context and preserve all expressions of the original text without reduction.
   </Translation Analysis Steps>
 
   OUTPUT
@@ -196,19 +197,9 @@ if not logger.handlers:
     logger.addHandler(file_handler)
     logger.setLevel(logging.DEBUG)
 
-# 加载配置
-settings = load_all_settings()
+from utils.llm_engines import ENGINES
 
-# 获取API配置
-api_key = settings.get('DEFAULT', {}).get('api_key', '')
-base_url = settings.get('DEFAULT', {}).get('base_url', 'https://api.deepseek.com')
-logger.info(f"API配置 - Key: {api_key[:10]}..., Base URL: {base_url}")
-# 常量定义
-MODEL = settings.get('DEFAULT', {}).get('selected_model', 'gpt-4o')
 CACHE_DIR = "cache"
-
-# 初始化OpenAI客户端
-client = openai.OpenAI(api_key=api_key, base_url=base_url)
 
 def get_cache_key(prompt: str, model: str) -> str:
     """
@@ -280,10 +271,15 @@ def clean_json_response(response: str) -> str:
     
     return response
 
-def call_llm(prompt: str, use_cache: bool = True) -> str:
+def call_llm(prompt: str, use_cache: bool = True, api_key=None, base_url=None, model=None) -> str:
     """
     调用LLM API
     """
+    if api_key is None or base_url is None or model is None:
+        raise ValueError("api_key, base_url and model parameters are required")
+    
+    # 在函数内部创建客户端
+    client = openai.OpenAI(api_key=api_key, base_url=base_url)
     # 暂时禁用缓存以避免格式问题
     # if use_cache:
     #     cached_result = get_cache(prompt, MODEL)
@@ -292,11 +288,11 @@ def call_llm(prompt: str, use_cache: bool = True) -> str:
     #         return cached_result
 
     try:
-        logger.debug(f"发送LLM请求，模型: {MODEL}, 提示词长度: {len(prompt)} 字符")
+        logger.debug(f"发送LLM请求，模型: {model}, 提示词长度: {len(prompt)} 字符")
         logger.debug(f"提示词前200字符: {prompt[:200]}...")
         
         response = client.chat.completions.create(
-            model=MODEL,
+            model=model,
             messages=[
                 {"role": "user", "content": prompt}
             ],
@@ -307,7 +303,6 @@ def call_llm(prompt: str, use_cache: bool = True) -> str:
         # 详细记录LLM响应
         logger.debug(f"LLM响应长度: {len(result)} 字符")
         logger.debug(f"LLM响应前500字符: {result[:500]}...")
-        logger.debug(f"LLM响应后100字符: ...{result[-100:]}")
         
         # 检查响应是否包含明显的错误标识
         if result and (result.strip().startswith('"') or 'error' in result.lower() or 'invalid' in result.lower()):
@@ -324,7 +319,7 @@ def call_llm(prompt: str, use_cache: bool = True) -> str:
         logger.error(f"提示词: {prompt[:100]}...")
         return ""
     
-def step1_direct_translate_batch(batch_segments: ASRData, batch_start_idx: int, batch_size: int, all_segments: ASRData = None, use_cache: bool = True, source_lang: str = 'en', target_lang: str = 'zh', terms_to_note: str = "") -> ASRData:
+def step1_direct_translate_batch(batch_segments: ASRData, batch_start_idx: int, batch_size: int, all_segments: ASRData = None, use_cache: bool = True, source_lang: str = 'en', target_lang: str = 'zh', terms_to_note: str = "", api_key=None, base_url=None, model=None) -> ASRData:
     """
     批量直译处理函数 - 处理一批sentences (10-20个)
     输入给LLM的序号始终是1到len(batch_segments)
@@ -373,7 +368,7 @@ def step1_direct_translate_batch(batch_segments: ASRData, batch_start_idx: int, 
     print("full_prompt:",full_prompt)
 
     # 调用LLM
-    response = call_llm(full_prompt, use_cache)
+    response = call_llm(full_prompt, use_cache, api_key, base_url, model)
     
     # 解析LLM返回的JSON
     try:
@@ -426,7 +421,7 @@ def step1_direct_translate_batch(batch_segments: ASRData, batch_start_idx: int, 
     
     return batch_segments
 
-def step1_direct_translate(asr_data: ASRData, use_cache: bool = True, batch_size: int = 15, num_threads: int = 4, source_lang: str = 'en', target_lang: str = 'zh', terms_to_note: str = "") -> ASRData:
+def step1_direct_translate(asr_data: ASRData, use_cache: bool = True, batch_size: int = 15, num_threads: int = 4, source_lang: str = 'en', target_lang: str = 'zh', terms_to_note: str = "", api_key=None, base_url=None, model=None) -> ASRData:
     """
     第一步：直译 - 使用FAITHFUL_PROMPT，支持批处理和多线程
     """
@@ -443,7 +438,7 @@ def step1_direct_translate(asr_data: ASRData, use_cache: bool = True, batch_size
     # 多线程处理批次
     def process_batch(batch_data):
         batch_segments, batch_start_idx = batch_data
-        return step1_direct_translate_batch(batch_segments, batch_start_idx, batch_size, asr_data, use_cache, source_lang, target_lang, terms_to_note)
+        return step1_direct_translate_batch(batch_segments, batch_start_idx, batch_size, asr_data, use_cache, source_lang, target_lang, terms_to_note, api_key, base_url, model)
     
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         batch_results = list(executor.map(process_batch, batches))
@@ -455,7 +450,7 @@ def step1_direct_translate(asr_data: ASRData, use_cache: bool = True, batch_size
     
     return ASRData(all_segments)
 
-def step2_free_translate_batch(batch_segments: ASRData, batch_start_idx: int, batch_size: int, all_segments: ASRData = None, use_cache: bool = True, source_lang: str = 'en', target_lang: str = 'zh', terms_to_note: str = "") -> ASRData:
+def step2_free_translate_batch(batch_segments: ASRData, batch_start_idx: int, batch_size: int, all_segments: ASRData = None, use_cache: bool = True, source_lang: str = 'en', target_lang: str = 'zh', terms_to_note: str = "", api_key=None, base_url=None, model=None) -> ASRData:
     """
     批量意译和反思处理函数 - 处理一批sentences (10-20个)
     输入给LLM的序号始终是1到len(batch_segments)
@@ -498,11 +493,10 @@ def step2_free_translate_batch(batch_segments: ASRData, batch_start_idx: int, ba
         previous_context if previous_context else "无前文上下文",
         next_context if next_context else "无后文上下文"
     )
-    print("prompt_with_context")
     full_prompt = prompt_with_context + "\n\nINPUT:\n" + json.dumps(input_json, ensure_ascii=False, indent=2)
     
     # 调用LLM
-    response = call_llm(full_prompt, use_cache)
+    response = call_llm(full_prompt, use_cache, api_key, base_url, model)
     
     # 解析LLM返回的JSON
     try:
@@ -558,7 +552,7 @@ def step2_free_translate_batch(batch_segments: ASRData, batch_start_idx: int, ba
     
     return batch_segments
 
-def step2_free_translate(asr_data: ASRData, use_cache: bool = True, batch_size: int = 15, num_threads: int = 4, source_lang: str = 'en', target_lang: str = 'zh', terms_to_note: str = "") -> ASRData:
+def step2_free_translate(asr_data: ASRData, use_cache: bool = True, batch_size: int = 15, num_threads: int = 4, source_lang: str = 'en', target_lang: str = 'zh', terms_to_note: str = "", api_key=None, base_url=None, model=None) -> ASRData:
     """
     第二步：意译和反思 - 使用FREE_PROMPT，支持批处理和多线程
     """
@@ -575,7 +569,7 @@ def step2_free_translate(asr_data: ASRData, use_cache: bool = True, batch_size: 
     # 多线程处理批次
     def process_batch(batch_data):
         batch_segments, batch_start_idx = batch_data
-        return step2_free_translate_batch(batch_segments, batch_start_idx, batch_size, asr_data, use_cache, source_lang, target_lang, terms_to_note)
+        return step2_free_translate_batch(batch_segments, batch_start_idx, batch_size, asr_data, use_cache, source_lang, target_lang, terms_to_note, api_key, base_url, model)
     
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         batch_results = list(executor.map(process_batch, batches))
@@ -591,12 +585,22 @@ def two_step_translate(asr_data: ASRData, use_cache: bool = True, num_threads: i
     """
     两步翻译流程：先直译，再意译和反思，支持批处理和多线程
     """
+    # 在这里加载设置，每次调用时都获取最新配置
+    settings = load_all_settings()
+    selected_model_provider = settings.get('DEFAULT', {}).get('selected_model_provider', 'deepseek')
+    api_key = settings.get('DEFAULT', {}).get(f'{selected_model_provider}_api_key', '')
+    base_url = settings.get('DEFAULT', {}).get(f'{selected_model_provider}_base_url', 'https://api.deepseek.com')
+    enable_thinking = settings.get('DEFAULT', {}).get('enable_thinking', 'true')
+    model = ENGINES[selected_model_provider]["thinking" if enable_thinking == 'true' else "normal"]
+    
+    logger.info(f"使用模型: {model}, API地址: {base_url}")
+    
     logger.info("开始第一步：批量多线程直译...")
-    asr_data = step1_direct_translate(asr_data, use_cache, batch_size, num_threads, source_lang, target_lang, terms_to_note)
+    asr_data = step1_direct_translate(asr_data, use_cache, batch_size, num_threads, source_lang, target_lang, terms_to_note, api_key, base_url, model)
     logger.info(f"直译完成，处理了 {len(asr_data.segments)} 个句子")
     
     logger.info("开始第二步：批量多线程意译和反思...")
-    asr_data = step2_free_translate(asr_data, use_cache, batch_size, num_threads, source_lang, target_lang, terms_to_note)
+    asr_data = step2_free_translate(asr_data, use_cache, batch_size, num_threads, source_lang, target_lang, terms_to_note, api_key, base_url, model)
     logger.info(f"意译和反思完成，处理了 {len(asr_data.segments)} 个句子")
     
     logger.info("两步翻译完成")
