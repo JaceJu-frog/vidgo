@@ -20,13 +20,14 @@ class TranscriptionEngine(ABC):
         self.config = config
     
     @abstractmethod
-    def transcribe_audio(self, audio_file_path: str, progress_cb: Callable[[str], None]) -> str:
+    def transcribe_audio(self, audio_file_path: str, progress_cb: Callable[[str], None], language: Optional[str] = None) -> str:
         """
         Transcribe audio file to SRT format
         
         Args:
             audio_file_path: Path to audio file
             progress_cb: Progress callback function
+            language: Optional language hint for transcription
             
         Returns:
             SRT format string with word-level timestamps
@@ -81,7 +82,7 @@ class ElevenLabsEngine(TranscriptionEngine):
         transcription_settings = config.get('Transcription Engine', {})
         self.api_key = transcription_settings.get('elevenlabs_api_key', '')
         
-    def transcribe_audio(self, audio_file_path: str, progress_cb: Callable[[str], None]) -> str:
+    def transcribe_audio(self, audio_file_path: str, progress_cb: Callable[[str], None], language: Optional[str] = None) -> str:
         try:
             progress_cb("Running")
             from .elevenlab_wsr import elevenlabs_stt_to_word_srt
@@ -121,7 +122,7 @@ class AlibabaEngine(TranscriptionEngine):
         transcription_settings = config.get('Transcription Engine', {})
         self.api_key = transcription_settings.get('alibaba_api_key', '')
         
-    def transcribe_audio(self, audio_file_path: str, progress_cb: Callable[[str], None]) -> str:
+    def transcribe_audio(self, audio_file_path: str, progress_cb: Callable[[str], None], language: Optional[str] = None) -> str:
         try:
             progress_cb("Running")
             
@@ -181,7 +182,7 @@ class OpenAIWhisperEngine(TranscriptionEngine):
         self.api_key = transcription_settings.get('openai_api_key', '')
         self.base_url = transcription_settings.get('openai_base_url', 'https://api.openai.com/v1')
         
-    def transcribe_audio(self, audio_file_path: str, progress_cb: Callable[[str], None]) -> str:
+    def transcribe_audio(self, audio_file_path: str, progress_cb: Callable[[str], None], language: Optional[str] = None) -> str:
         try:
             progress_cb("Running")
             
@@ -260,7 +261,7 @@ class RemoteVidGoEngine(TranscriptionEngine):
         else:
             self.base_url = None
     
-    def transcribe_audio(self, audio_file_path: str, progress_cb: Callable[[str], None]) -> str:
+    def transcribe_audio(self, audio_file_path: str, progress_cb: Callable[[str], None], language: Optional[str] = None) -> str:
         if not self.is_available():
             raise Exception("Remote VidGo service is not properly configured")
         
