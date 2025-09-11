@@ -1,7 +1,8 @@
 # parent folder
 refer_code/
 test_vid/
-__pycache__/
+__pycache__/ 
+# 不带前导斜杠的目录模式会在任意层级匹配名为 __pycache__ 的目录，整目录及其内容都会被忽略；
 .env
 
 # backend
@@ -11,6 +12,7 @@ backend/.claude/
 backend/.vscode/
 backend/videos.db
 backend/videos.db.bak
+backend/videos.backup.db
 backend/videos_url.json
 backend/miaowu.txt
 backend/Dockerfile
@@ -26,7 +28,8 @@ backend/cache/
 backend/static/
 backend/staticfiles/
 backend/accounts/
-backend/video/migrations/
+# backend/video/migrations/
+# backend/accounts/migrations/
 backend/test/
 backend/work_dir/
 backend/media/
