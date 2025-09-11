@@ -1,0 +1,35 @@
+[DEFAULT]
+api_key = <Your-api-key>
+base_url = https://api.chatanywhere.tech/v1
+model="deepseek-v3"
+
+[Video watch]
+raw_language = zh
+
+[Subtitle settings]
+font_family = 微软雅黑
+preview_text = 这是字幕预设文本
+font_color = #fdfcfc
+font_size = 24
+font_weight = 400
+background_color = #171616
+border_radius = 4
+text_shadow = true
+background_style = semi-transparent
+bottom_distance = 90
+
+[Foreign Subtitle settings]
+foreign_font_family = 宋体
+foreign_preview_text = This is foreign subtitle preview
+foreign_font_color = #ffffff
+foreign_font_size = 24
+foreign_font_weight = 400
+foreign_background_color = #000000
+foreign_border_radius = 4
+foreign_text_shadow = false
+foreign_background_style = solid
+foreign_bottom_distance = 100
+
+[Media Credentials]
+bilibili_sessdata = 91c63826%2C1771727167%2Cb15a2%2A81CjDvfTYMLigs5NAjQ81bnVvaYBLe9wVfcvqiPkgrV9xE8cPKmZgW31L4W3NOrD7mmnISVmdTbXRWLVl4cXJRRUpRNURVaXpRcDhHWXVSLUJZTmwtQ3MySGN5c1ZnOXVIUklDYzhaZmFadlFWbmliV1dPaUdiY2VIVmszejZ3anJjWXNCUGFoWDNBIIEC
+

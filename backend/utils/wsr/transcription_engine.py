@@ -269,7 +269,7 @@ class RemoteVidGoEngine(TranscriptionEngine):
             progress_cb("Running")
             
             # Submit audio file for transcription
-            submit_url = f"{self.base_url}/external_transcription/submit"
+            submit_url = f"{self.base_url}/api/external_transcription/submit"
             
             with open(audio_file_path, 'rb') as audio_file:
                 files = {'audio_file': audio_file}
@@ -282,7 +282,7 @@ class RemoteVidGoEngine(TranscriptionEngine):
             task_id = task_data['task_id']
             
             # Poll for completion
-            status_url = f"{self.base_url}/external_transcription/{task_id}/status"
+            status_url = f"{self.base_url}/api/external_transcription/{task_id}/status"
             max_wait_time = 1800  # 30 minutes
             start_time = time.time()
             
@@ -294,7 +294,7 @@ class RemoteVidGoEngine(TranscriptionEngine):
                     
                     if status == 'completed':
                         # Download result
-                        result_url = f"{self.base_url}/external_transcription/{task_id}/result"
+                        result_url = f"{self.base_url}/api/external_transcription/{task_id}/result"
                         result_response = requests.get(result_url, timeout=30)
                         
                         if result_response.status_code == 200:
@@ -302,7 +302,7 @@ class RemoteVidGoEngine(TranscriptionEngine):
                             
                             # Clean up remote task
                             try:
-                                delete_url = f"{self.base_url}/external_transcription/{task_id}/delete"
+                                delete_url = f"{self.base_url}/api/external_transcription/{task_id}/delete"
                                 requests.delete(delete_url, timeout=10)
                             except:
                                 pass  # Ignore cleanup errors
@@ -341,7 +341,7 @@ class RemoteVidGoEngine(TranscriptionEngine):
         
         try:
             # Test connectivity with a simple request to the list endpoint
-            list_url = f"{self.base_url}/external_transcription/list"
+            list_url = f"{self.base_url}/api/external_transcription/list"
             response = requests.get(list_url, timeout=10)
             return response.status_code == 200
         except:
