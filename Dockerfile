@@ -66,6 +66,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
+# 仅复制配置的备份文件到镜像固定位置（**不是**挂载点）
+COPY backend/config/config.ini.backup /app/config.ini.backup
+
+RUN mkdir -p /app/config
 # Copy Python packages from builder (system-wide installation)
 COPY --from=python-builder /usr/local /usr/local
 
@@ -74,12 +78,14 @@ COPY --from=compile-frontend /app/frontend/dist /app/static
 
 # Copy backend code only
 COPY backend/ .
-
+# 复制启动脚本
+COPY --chown=vidgo:vidgo backend/docker/entrypoint.sh /app/entrypoint.sh
 # Create user and directories
 RUN useradd --create-home --uid 1000 vidgo \
-    && mkdir -p /app/media /app/models \
+    && mkdir -p /app/media /app/models /app/database \
     && chown -R vidgo:vidgo /app
 
+RUN chmod +x /app/entrypoint.sh
 USER vidgo
 # default port at 8000
 EXPOSE 8000
@@ -88,9 +94,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=vid_go.settings \
     HF_ENDPOINT=https://hf-mirror.com \
-    HUGGINGFACE_HUB_CACHE=/app/models/.cache/huggingface
+    HUGGINGFACE_HUB_CACHE=/app/models/.cache/huggingface \
+    APP_CONFIG_DIR=/app/config
 
-VOLUME ["/app/media", "/app/models"]
+VOLUME ["/app/config", "/app/database", "/app/media", "/app/models"]
+
+# 运行启动脚本
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Use gunicorn for production
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--timeout", "120", "vid_go.wsgi:application"]

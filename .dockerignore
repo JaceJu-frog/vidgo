@@ -8,12 +8,14 @@ logs/
 rubbish/
 test/
 backend/.claude/
+backend/database/
 backend/.git/
 backend/.vscode/
 backend/__pycache__/
 backend/work_dir/
 backend/cache/
 backend/static/
+backend/config/config.ini
 backend/doc/
 backend/media/
 backend/models/
