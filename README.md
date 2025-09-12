@@ -1,99 +1,91 @@
-# 视频介绍:
-23:00 ：开始介绍vue项目的基本设置
+# VidGo 项目概览
 
-# 安装方式。
+VidGo是一个专为个人家庭NAS用户和小型团队设计的视频管理平台，提供完整的视频内容管理解决方案。
+项目提供示例网站供用户测试使用： https://example.vidgo.cemp.top/
+具体使用可参考项目文档：https://doc.vidgo.cemp.top/
 
-# 一些需要注意的地方:
-整体架构中的重要文件为:
-```
-|--src
-|   |componets\
-|   |BackButton.vue
-|   |Card.vue
-|   |Hero.vue
-|   |HomeCards.vue
-|   |JobListing.vue
-|   |JobListings.vue
-|   |Navbar.vue
-|   |
-|   |router\
-|   |index.js //Controls which view to display,like urls.py in django. 
-|   |
-|   |
-|   |views\
-|   |AddJobView.vue
-|   |EditJobView.vue
-|   |HomeView.vue
-|   |...
-以package.json为首的Lock文件.
-```
+![概览](https://doc.vidgo.cemp.top/assets/images/overview-6abee6dae72e659c5837d798dd0090a2.png)
+### 核心功能特性
 
-以router/index.js定义用户访问某个链接时前端需要加载什么页面,此时django仅需要提供后端.
-```js
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
-    {
-      path: '/jobs',
-      name: 'jobs',
-      component: JobsView,
-    },
-    {
-      path: '/jobs/:id',
-      name: 'job',
-      component: JobView,
-    },
-    {
-      path: '/jobs/add',
-      name: 'add-job',
-      component: AddJobView,
-    },
-    {
-      path: '/jobs/edit/:id',
-      name: 'edit-job',
-      component: EditJobView,
-    },
-    {
-      path: '/:catchAll(.*)',
-      name: 'not-found',
-      component: NotFoundView,
-    },
-  ],
-});
-```
+**流媒体视频下载**
+- 支持Bilibili、YouTube、Apple Podcasts等主流平台的音视频下载  
+- 提供外链解析和批量下载功能 
+
+**智能字幕系统**
+- 多引擎转录支持：Faster-Whisper本地处理、ElevenLabs、阿里巴巴DashScope、OpenAI Whisper
+- 高级字幕编辑器，支持实时预览和样式自定义
+    - 支持音频波形展示&同步
+    - 支持双语字幕/字幕嵌入视频导出
+- 双语字幕显示和翻译功能
+
+**视频管理与组织**
+- 分类和合集管理系统 
+- 批量操作支持（移动、删除、字幕生成、视频合并）
+- 缩略图管理和视频预览
+
+**用户认证和权限管理**
+- 主用户/普通用户分离
+- 可单独为普通用户设置权限与分类展示。
+
+### 技术架构
+
+**前端技术栈**
+- Vue.js 3 + TypeScript + Vite构建的单页应用
+- Element Plus UI组件库提供现代化界面
+- 国际化支持（中文/英文）
+
+**后端服务**
+- Django REST API提供数据服务
+- 后台任务队列，处理流媒体下载，视频合成，字幕生成
+- 配置文件管理系统，支持多种服务集成
 
 
-# vue-crash-2024-my-ver
+### 用户界面
 
-This template should help get you started developing with Vue 3 in Vite.
+**主界面布局**
+- 左侧导航栏：分类管理、菜单导航、用户认证
+- 主内容区：视频上传、媒体库浏览、任务状态监控 
+- 多标签页支持：首页、媒体库、搜索、历史记录
 
-## Recommended IDE Setup
+**视频播放体验**
+- 集成字幕显示面板 
+- 章节导航和时间轴跳转
+- 双语字幕切换和自动滚动 
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+# 快速开始
+项目提供示例网站，地址为https://example.vidgo.cemp.top ，需要输入用户名&密码。
 
-## Customize configuration
+用户名:**user**,
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+密码:**User123**.
 
-## Project Setup
+示例网站暂不支持基于本地的字幕识别，但支持基于云端的字幕识别，用户可以体验视频观看，字幕编辑等功能。
 
-```sh
-npm install
-```
+项目支持以下三种方式部署：
+1. node + python
+2. Pure python
+3. Docker部署
 
-### Compile and Hot-Reload for Development
+## Node + python部署
+需要下载node和Python的对应依赖，并完成部署。
 
-```sh
-npm run dev
-```
 
-### Compile and Minify for Production
+## Python部署
+对于不了解前端，仅有Python知识的用户，项目已将前端代码基于npm打包，并提供纯Python代码用于部署，部署的结果与方法一相同，但只需要下载Python依赖。
 
-```sh
-npm run build
-```
+## Docker快速部署
+在命令行中输入命令
+`docker pull jaceju68/vidgo:latest`
+使用Docker快速部署。
+
+项目同时支持采用docker-compose.yml部署，默认使用nvidia的GPU.
+
+
+# 未来规划
+- [ ] 增加模糊搜索，匹配与用户搜索内容相近的项目
+- [ ] 优化字幕编辑页面的"音频展示"，使UI更现代化。
+- [ ] 增加Ai生成视频笔记，视频思维导图，视频章节的功能。
+- [ ] 支持更多的WSR模型，包括剪映提供的高准确度模型。
+- [ ] 支持更多的LLM模型
+
+VidGo通过现代化的技术栈和用户友好的界面设计，为个人和小团队提供了完整的视频内容管理解决方案，特别在字幕处理和多平台内容整合方面具有显著优势。
