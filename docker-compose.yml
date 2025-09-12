@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  vidgo:
+    image: jaceju68/vidgo:latest
+    container_name: vidgo-app
+    restart: unless-stopped
+    ports:
+      - "8010:8000"
+    volumes:
+      # 数据库文件
+      - ./data/videos.db:/app/videos.db
+      # 媒体文件目录  
+      - ./data/media:/app/media
+      # 用户配置目录
+      - ./data/config:/app/config
+      # 模型文件目录
+      - ./data/models:/app/models
+

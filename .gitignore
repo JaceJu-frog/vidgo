@@ -29,6 +29,7 @@ backend/models/
 backend/rubbish/
 backend/config/config.ini
 backend/cache/
+backend/database/
 backend/static/
 backend/staticfiles/
 # backend/accounts/

@@ -124,7 +124,7 @@ WSGI_APPLICATION = 'vid_go.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'videos.db',  # 指向你的 Flask 数据库文件
+        'NAME': BASE_DIR / "database" / "videos.db",  # 指向你的 Flask 数据库文件
     },
     # 'legacy': {
     #     'ENGINE': 'django.db.backends.sqlite3',
