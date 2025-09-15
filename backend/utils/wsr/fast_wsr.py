@@ -39,7 +39,7 @@ def get_model() -> WhisperModel:
             current_dir = os.path.dirname(os.path.abspath(__file__))
             # 从 utils/wsr/ 回到项目根目录
             project_root = os.path.dirname(os.path.dirname(current_dir))
-            model_dir = os.path.join(project_root, "models", f"whisper-{model_name}")
+            model_dir = os.path.join(project_root, "models")
         
         print(f"Using model: {model_name}, directory: {model_dir}")
         

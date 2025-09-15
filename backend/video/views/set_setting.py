@@ -359,10 +359,9 @@ class WhisperModelAPIView(View):
                     
                     download_progress[model_name] = 0
                     models_dir = os.path.join(dj_settings.BASE_DIR, 'models')
-                    model_path = os.path.join(models_dir, f"whisper-{model_name}")
-                    
+                    model_path = models_dir
+
                     os.makedirs(models_dir, exist_ok=True)
-                    os.makedirs(model_path, exist_ok=True)
                     
                     print(f"Starting download of {model_name} to {model_path}")
                     
@@ -431,7 +430,7 @@ class WhisperModelSizeAPIView(View):
             
             # Calculate folder size
             models_dir = os.path.join(dj_settings.BASE_DIR, 'models')
-            model_path = os.path.join(models_dir, f"whisper-{model_name}")
+            model_path = models_dir
             
             if not os.path.exists(model_path):
                 return JsonResponse({
