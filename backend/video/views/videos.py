@@ -49,7 +49,7 @@ import os
 import json
 import urllib
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.utils.decorators import method_decorator
 import cv2
 import subprocess
@@ -447,7 +447,7 @@ class VideoInfoView(JsonView):
         except Video.DoesNotExist:
             return self.json_err('Video not found', status=404)
 
-@method_decorator(csrf_exempt, name="dispatch")
+@method_decorator(csrf_protect, name="dispatch")
 class VideoActionView(View):
     def dispatch(self, request, *args, **kwargs):
         self.action = kwargs.pop('action', None)
@@ -513,8 +513,7 @@ class VideoActionView(View):
             return self.has_waveform_peaks(request, video_id)
         elif self.action == 'get_dimensions':
             return self.get_dimensions(request, video_id)
-    
-    @csrf_exempt
+
     def upload(self, request, video_id):
         # 检查是否有文件上传
         file = None

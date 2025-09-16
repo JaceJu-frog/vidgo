@@ -35,7 +35,7 @@ def __get_list(env_var, default=None):
         return [item.strip() for item in value.split(',') if item.strip()]
     return default or []
 
-# 允许承载server的 Host
+# 允许承载server的 Host,这里全放通
 ALLOWED_HOSTS = __get_list('VIDGO_ALLOWED_HOSTS', ['*'])
 
 # Dynamic CORS and CSRF configuration
@@ -48,6 +48,10 @@ CSRF_TRUSTED_ORIGINS = __get_list(
     'VIDGO_CSRF_TRUSTED_ORIGINS',
     ["http://localhost:4173", "http://127.0.0.1:4173"]  # Default for development
 )
+
+# 全站 HTTPS 建议
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 # Function to parse VIDGO_URL and automatically configure CORS, CSRF, and ALLOWED_HOSTS
 def _parse_vidgo_url():
@@ -145,13 +149,6 @@ WSGI_APPLICATION = 'vid_go.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 DATABASES = {
     'default': {

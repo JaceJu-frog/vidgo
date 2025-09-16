@@ -25,7 +25,7 @@ from .views.external_transcription import (
     ExternalTranscriptionListView,
     ExternalTranscriptionDeleteView
 )
-from django.views.decorators.csrf import csrf_exempt,get_token
+from django.views.decorators.csrf import csrf_exempt,get_token,ensure_csrf_cookie
 from .tasks import SubtitleTaskStatusView
 from .views import stream_media
 from .views import subtitles
@@ -35,7 +35,7 @@ from django.views.decorators.http import require_GET
 from django.http import JsonResponse
 app_name="video"
 
-# Success
+@ensure_csrf_cookie
 def get_csrf_token(request):
   token = django.middleware.csrf.get_token(request)
   return JsonResponse({'csrf_token': token})
@@ -107,7 +107,6 @@ urlpatterns = [
     # serve media
     path('media/<str:type>/<path:filename>', MediaActionView.as_view(), name='serve_media'),
 
-    # ---------- API: 其余全部 ----------
     # Config & Engines & Test
     path('api/config/', ConfigAPIView.as_view(), name='config_api'),
     path('api/transcription-engines/', TranscriptionEnginesAPIView.as_view(), name='transcription_engines_api'),

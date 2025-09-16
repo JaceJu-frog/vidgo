@@ -58,7 +58,6 @@ async function confirm() {
         video_name_list: props.videoNameList,
         src_lang: srcLang.value,
         trans_lang: transLang.value === 'none' ? '' : transLang.value,
-        // 下面两个字段目前后端未用，先占位发过去
         emphasize_src: emphasizeSrc.value,
         emphasize_dst: emphasizeDst.value,
       }),
