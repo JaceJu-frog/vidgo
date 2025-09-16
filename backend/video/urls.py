@@ -45,18 +45,18 @@ import requests
 
 # 放到模块顶层，避免每次函数调用都重新创建列表
 THUMBNAIL_ALLOWED_HOSTS = {
-    # Bilibili CDN domains
+    # B站CDN域名
     "i0.hdslb.com",
-    "i1.hdslb.com", 
+    "i1.hdslb.com",
     "i2.hdslb.com",
     "i3.hdslb.com",
-    # YouTube thumbnail domains
+    # YouTube缩略图域名
     "i.ytimg.com",
     "img.youtube.com",
 }
 
 # 设置一个合理的超时时间，防止代理卡死
-REQUEST_TIMEOUT = (3.0, 5.0)   # (connect timeout, read timeout)
+REQUEST_TIMEOUT = (3.0, 5.0)   # (连接超时, 读取超时)
 
 @require_GET
 def thumbnail_proxy(request):
@@ -102,12 +102,12 @@ def thumbnail_proxy(request):
 """
 urlpatterns = [
     # ---------- MEDIA: 仅文件/图片/流媒体直出 ----------
-    # B站视频封面图片代理 - MUST be before generic media pattern
+    # B站视频封面图片代理 - 必须在通用媒体模式之前
     path('media/thumbnail/', thumbnail_proxy, name='proxy-thumbnail'),
-    # serve media
+    # 媒体文件服务
     path('media/<str:type>/<path:filename>', MediaActionView.as_view(), name='serve_media'),
 
-    # Config & Engines & Test
+    # 配置与引擎测试
     path('api/config/', ConfigAPIView.as_view(), name='config_api'),
     path('api/transcription-engines/', TranscriptionEnginesAPIView.as_view(), name='transcription_engines_api'),
     path('api/llm-test/', LLMTestAPIView.as_view(), name='llm_test_api'),
@@ -116,7 +116,7 @@ urlpatterns = [
     path('api/whisper-models/size/', WhisperModelSizeAPIView.as_view(), name='whisper_models_size_api'),
     path('api/get_csrf_token/', get_csrf_token, name='get_csrf_token'),
 
-    # Videos
+    # 视频相关
     path('api/videos/', VideoDataView.as_view(), name='video_data'),
     path('api/videos/search/', VideoSearchView.as_view(), name='video_search'),
     path('api/videos/last/', LastVideoDataView.as_view(), name='last_video_data'),
@@ -126,15 +126,15 @@ urlpatterns = [
     path('api/videos/batch_action', BatchVideoActionView.as_view(), name='batch_video_action'),
     path('api/videos/<int:video_id>/download/<str:format_type>', VideoDownloadView.as_view(), name='video_download'),
 
-    # Convert to hls /audio
+    # 转换为HLS/音频格式
     path('api/convert-hls/<int:video_id>', ConvertHLSView.as_view(), name='convert_hls_api'),
     path('api/convert-audio/<int:video_id>/', ConvertAudioView.as_view(), name='convert_audio'),
 
-    # Subtitle / Mindmap
+    # 字幕与思维导图
     path('api/subtitle/<str:action>/<int:video_id>', SubtitleActionView.as_view(), name='subtitle_action'),
     path('api/mindmap/<str:action>/<int:video_id>', MindmapActionView.as_view(), name='mindmap_action'),
 
-    # Stream media control-plane
+    # 流媒体控制面板
     path('api/stream_media/query', stream_media.InfoView.as_view(), name='query_info'),
     path('api/stream_media/download/add', stream_media.DownloadActionView.as_view(), name='download_action'),
     path('api/stream_media/download_status', stream_media.AllDownloadStatusView.as_view(), name='download_status'),
@@ -142,16 +142,16 @@ urlpatterns = [
     path('api/stream_media/download/<str:task_id>/status', stream_media.DownloadStatusView.as_view(), name='download_status'),
     path('api/stream_media/download/<str:task_id>/retry', stream_media.RetryDownloadTaskView.as_view()),
 
-    # Category / Collection
+    # 分类与合集
     path('api/category/<str:action>/<int:video_id>', CategoryActionView.as_view(), name='category_action'),
     path('api/collection/<str:action>/<int:collection_id>', CollectionActionView.as_view()),
     path('api/collection/list', CollectionActionView.as_view(), {'action': 'list', 'collection_id': 0}),
 
-    # Waveform data
+    # 波形数据
     path('api/waveform/list', WaveformListView.as_view(), name='waveform_list'),
     path('api/waveform/<path:filename>', WaveformAPIView.as_view(), name='waveform_api'),
 
-    # Export
+    # 导出功能
     path('api/export/add', ExportTaskAddView.as_view(), name='export_add'),
     path('api/export/status', AllExportStatusView.as_view(), name='export_status'),
     path('api/export/<str:task_id>/status', ExportStatusView.as_view(), name='export_status_single'),
@@ -159,14 +159,14 @@ urlpatterns = [
     path('api/export/<str:task_id>/retry', RetryExportTaskView.as_view(), name='export_retry'),
     path('api/export/<str:task_id>/download', ExportedVideoDownloadView.as_view(), name='export_download'),
 
-    # External transcription
+    # 外部转录服务
     path('api/external_transcription/submit', ExternalTranscriptionSubmitView.as_view(), name='external_transcription_submit'),
     path('api/external_transcription/<str:task_id>/status', ExternalTranscriptionStatusView.as_view(), name='external_transcription_status'),
     path('api/external_transcription/<str:task_id>/result', ExternalTranscriptionResultView.as_view(), name='external_transcription_result'),
     path('api/external_transcription/list', ExternalTranscriptionListView.as_view(), name='external_transcription_list'),
     path('api/external_transcription/<str:task_id>/delete', ExternalTranscriptionDeleteView.as_view(), name='external_transcription_delete'),
 
-    # Tasks (subtitle)
+    # 任务管理（字幕）
     path('api/tasks/subtitle_generate/status', subtitles.AllSubtitleGenerationInfoView.as_view()),
     path('api/tasks/subtitle_generate/add', subtitles.SubtitleGenerationAddView.as_view()),
     path('api/tasks/subtitle_translation/add', subtitles.SubtitleTranslationAddView.as_view()),

@@ -1,22 +1,22 @@
-// utils/peaks.ts
+// Utility functions for processing audio waveform peak data
 import { isProxy, toRaw, markRaw } from 'vue'
 
 export function normalizePeaks(input: any): number[] {
-  // 1) 去掉 Vue 的 Proxy
+  // Remove Vue proxy wrapper if present
   const p: any = isProxy(input) ? toRaw(input) : input
 
-  // 2) 已是普通数组
+  // Handle standard array format
   if (Array.isArray(p)) return p.map(Number)
 
-  // 3) TypedArray（Float32Array/Int16Array/...）
+  // Handle TypedArray formats (Float32Array/Int16Array/etc.)
   if (p && typeof p === 'object' && typeof p.length === 'number' && ArrayBuffer.isView(p)) {
-    // p.buffer 存在且不是 DataView → 视为 TypedArray
+    // Convert TypedArray to regular number array
     return Array.from(p as unknown as Iterable<number>, Number)
   }
 
-  // 4) 形如 {0: v0, 1: v1, ...} 的对象（常见于 JSON 化的 TypedArray）
+  // Handle object with numeric keys (common when TypedArray is JSON serialized)
   if (p && typeof p === 'object') {
-    // 用数字键排序，确保顺序正确
+    // Sort by numeric keys to maintain proper order
     const keys = Object.keys(p)
       .map(Number)
       .sort((a, b) => a - b)

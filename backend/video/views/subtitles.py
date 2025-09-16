@@ -1,7 +1,7 @@
 from django.http import JsonResponse,HttpResponse,HttpResponseNotAllowed,HttpResponseNotFound,Http404,FileResponse,HttpResponseBadRequest
 from ..models import Category, Video
 from django.views import View
-from django.conf import settings  # Ensure this is at the top
+from django.conf import settings  # 确保这个在顶部
 from django.shortcuts import get_object_or_404,render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -28,7 +28,7 @@ class SubtitleActionView(View):
     def dispatch(self, request, *args, **kwargs):
         self.action = kwargs.pop('action', None)
         print(self.action)
-        # Grab lang from the query string:  /…/upload/?lang=en
+        # 从查询字符串中获取语言: /…/upload/?lang=en
         self.lang = request.GET.get("lang", "").lower()
         if not self.lang:
             return JsonResponse({"error": "No language code"}, status=400)
@@ -157,14 +157,14 @@ class SubtitleGenerationAddView(View):
         for idx,vid in enumerate(video_id_list,start=1):
             title=f"{video_name_list[idx-1]}"
             
-            # Update video's raw_lang field in database
+            # 在数据库中更新视频的raw_lang字段
             try:
                 video = Video.objects.get(pk=vid)
                 if src_lang in ['en', 'zh', 'jp']:
                     video.raw_lang = src_lang
                     video.save(update_fields=['raw_lang'])
             except Video.DoesNotExist:
-                pass  # Continue with task creation even if video not found
+                pass  # 即使找不到视频也继续创建任务
             
             subtitle_task_status[vid] = {
                 "filename": title,
@@ -178,7 +178,7 @@ class SubtitleGenerationAddView(View):
 
         return JsonResponse({"success": True})
 
-# retry / delete
+# 重试 / 删除
 class SubtitleGenerationTaskView(View):
     def dispatch(self, request, *args, **kwargs):
         self.action = kwargs.pop('action', None)
@@ -277,11 +277,11 @@ class SubtitleTranslationAddView(View):
         if not target_lang or target_lang not in ['zh', 'en', 'jp']:
             return JsonResponse({'error': 'Invalid target language'}, status=400)
         
-        # Check if original subtitles exist for all videos
+        # 检查所有视频是否存在原始字幕
         for vid in video_id_list:
             try:
                 video = Video.objects.get(pk=vid)
-                # Check if original subtitle file exists
+                # 检查原始字幕文件是否存在
                 original_lang = video.raw_lang or 'en'
                 file_name = f"{vid}_{original_lang}.srt"
                 file_path = os.path.abspath(os.path.join(SAVE_DIR, file_name))
@@ -294,25 +294,25 @@ class SubtitleTranslationAddView(View):
             except Video.DoesNotExist:
                 return JsonResponse({'error': f'Video with ID {vid} not found'}, status=404)
         
-        # Generate translation tasks
+        # 生成翻译任务
         return self.enqueue_translation_task(request, video_id_list, video_name_list, target_lang, emphasize_dst)
     
     def enqueue_translation_task(self, request, video_id_list: list, video_name_list: list, target_lang: str, emphasize_dst: str):
-        # Add translation-only tasks to queue
+        # 添加仅翻译任务到队列
         for idx, vid in enumerate(video_id_list, start=1):
             title = f"{video_name_list[idx-1]}"
             
             subtitle_task_status[vid] = {
                 "filename": title,
-                "src_lang": "existing",  # Indicates using existing subtitles
+                "src_lang": "existing",  # 表示使用现有字幕
                 "trans_lang": target_lang,
                 "emphasize_dst": emphasize_dst,
                 "video_id": vid,
-                "translation_only": True,  # Flag to indicate translation-only mode
+                "translation_only": True,  # 标志表示仅翻译模式
                 "stages": {
-                    "transcribe": "Skipped",  # Skip transcription
-                    "optimize": "Skipped",    # Skip optimization
-                    "translate": "Queued",    # Only do translation
+                    "transcribe": "Skipped",  # 跳过转录
+                    "optimize": "Skipped",    # 跳过优化
+                    "translate": "Queued",    # 仅执行翻译
                 },
                 "overall": "Queued",
             }

@@ -5,7 +5,7 @@ import { generateVTT } from '@/composables/Buildvtt'
 import { ElMessage } from 'element-plus'
 import type { Subtitle, SubtitleBilingual } from '@/types/subtitle'
 
-// Use editing index instead of editing property
+// Subtitle management composable with editing state tracking
 const _defaultrawSub: Subtitle[] = [
   {
     start: 0,
@@ -95,7 +95,7 @@ const _defaultforeignSub: Subtitle[] = [
 const subtitles = ref<Subtitle[]>(_defaultrawSub)
 const subtitle2 = ref<Subtitle[]>(_defaultrawSub)
 
-// helper to turn a plain SubtitleBilingual[] into a Ref<…>
+// Helper function to convert SubtitleBilingual array to reactive reference
 function asRef(arr: SubtitleBilingual[] | null): Ref<SubtitleBilingual[]> {
   return computed(() => arr ?? [])
 }
@@ -134,8 +134,8 @@ function parseSRT(srt: string) {
   return subtitles
 }
 
-/** Serialize subtitles to SRT (for download / upload) */
-// subtitles(list) to srtContent(pure text)
+/** Serialize subtitles to SRT format (for download/upload) */
+// Convert subtitle array to SRT text content
 function serializeSRT(subs: Ref<Subtitle[]> = subtitles) {
   let srtContent = ''
   subs.value.forEach((sub, index) => {
@@ -162,10 +162,10 @@ function serializeSRT(subs: Ref<Subtitle[]> = subtitles) {
 //   URL.revokeObjectURL(link.href)
 // }
 
-// 自动上传字幕到数据库
+// Upload subtitles to database automatically
 async function linkSubtitles(
-  id: number, // videoId
-  lang: string = 'zh', // srt language
+  id: number, // Video ID
+  lang: string = 'zh', // Subtitle language
   subtitles: Ref<Subtitle[]>,
 ): Promise<void> {
   const srtContent = serializeSRT(subtitles)

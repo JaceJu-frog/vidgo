@@ -11,10 +11,10 @@ const route = useRoute()
 const props = defineProps<{
   showTranslation: boolean
   progress: number
-  currentTime: number // ★ 新增
-  videoLength: string // ★ 新增，如 '00:08:04'
-  title?: string // ★ 新增视频标题
-  filename?: string // ★ 新增文件名用于路由切换
+  currentTime: number // Current playback time in seconds
+  videoLength: string // Video duration in format '00:08:04'
+  title?: string // Video title for display
+  filename?: string // Filename for route navigation
 }>()
 
 // Check if title is truncated
@@ -44,7 +44,7 @@ const showTranslationProxy = computed({
   get: () => props.showTranslation,
   set: (v) => {
     emit('update:showTranslation', v)
-    emit('toggle-translation') // toggle translation/raw subtitle display.
+    emit('toggle-translation') // Toggle between translation and raw subtitle display
   },
 })
 

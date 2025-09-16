@@ -49,27 +49,27 @@ class Collection(models.Model):
 
 
 class VideoAttachment(models.Model):
-    """Unified attachment model for both Notes and Mindmap"""
+    """笔记和思维导图的统一附件模型"""
     video = models.ForeignKey('Video', on_delete=models.CASCADE, related_name='attachments')
     
-    # File information
-    filename = models.CharField(max_length=255, help_text="Generated filename for storage")
-    original_name = models.CharField(max_length=255, help_text="Original filename from user")
-    file_path = models.CharField(max_length=500, help_text="Relative path from MEDIA_ROOT")
-    file_type = models.CharField(max_length=50, help_text="MIME type like 'image/jpeg'")
-    file_size = models.IntegerField(help_text="File size in bytes")
+    # 文件信息
+    filename = models.CharField(max_length=255, help_text="生成的存储文件名")
+    original_name = models.CharField(max_length=255, help_text="用户原始文件名")
+    file_path = models.CharField(max_length=500, help_text="相对于MEDIA_ROOT的路径")
+    file_type = models.CharField(max_length=50, help_text="MIME类型，如'image/jpeg'")
+    file_size = models.IntegerField(help_text="文件大小（字节）")
     
-    # Usage context
+    # 使用上下文
     context_type = models.CharField(max_length=20, choices=[
         ('notes', 'Notes'),
         ('mindmap', 'Mindmap')
-    ], help_text="Where this attachment is used")
-    context_id = models.CharField(max_length=100, blank=True, help_text="Mindmap node ID when used in mindmap")
+    ], help_text="此附件的使用位置")
+    context_id = models.CharField(max_length=100, blank=True, help_text="在思维导图中使用时的节点ID")
     
-    # Metadata
-    alt_text = models.CharField(max_length=255, blank=True, help_text="Alt text for accessibility")
+    # 元数据
+    alt_text = models.CharField(max_length=255, blank=True, help_text="可访问性的替代文本")
     upload_time = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True, help_text="False for soft delete")
+    is_active = models.BooleanField(default=True, help_text="软删除时设为False")
     
     class Meta:
         db_table = 'video_attachment'
@@ -84,18 +84,18 @@ class VideoAttachment(models.Model):
     
     @property
     def url(self):
-        """Return the URL path for this attachment"""
+        """返回此附件的URL路径"""
         return f"/media/{self.file_path}"
     
     def delete_file(self):
-        """Delete the physical file from storage"""
+        """从存储中删除物理文件"""
         try:
             full_path = os.path.join(settings.MEDIA_ROOT, self.file_path)
             if os.path.exists(full_path):
                 os.remove(full_path)
                 return True
         except Exception as e:
-            print(f"Error deleting file {self.file_path}: {e}")
+            print(f"删除文件错误 {self.file_path}: {e}")
         return False
 
 
@@ -126,7 +126,7 @@ class Video(models.Model):
     notes = models.TextField(blank=True, null=True, max_length=8000, help_text="视频笔记，Markdown格式，限制8000字符")
     mindmap_content = models.JSONField(blank=True, null=True, default=dict, help_text="思维导图内容，JSON格式存储")
     
-    # New fields
+    # 新字段
     video_source = models.CharField(
         max_length=20, 
         choices=[
@@ -163,7 +163,7 @@ class Video(models.Model):
         # auto_now=True,  # 每次保存时自动更新（但无法手动控制）
     )
     def __str__(self):
-        # pick whatever fields help you recognise the object at a glance
+        # 选择能快速识别对象的字段
         return f"{self.name} (id={self.pk}) (collection={self.collection})"
     class Meta:
         db_table = 'video'
@@ -182,6 +182,6 @@ def delete_video_files(sender, instance, **kwargs):  # pylint: disable=unused-ar
             
             if os.path.exists(thumbnail_path):
                 os.remove(thumbnail_path)
-                print(f"Signal: Deleted thumbnail {instance.thumbnail_url}")
+                print(f"信号：已删除缩略图 {instance.thumbnail_url}")
         except Exception as e:
-            print(f"Signal: Failed to delete thumbnail {instance.thumbnail_url}: {e}")
+            print(f"信号：删除缩略图失败 {instance.thumbnail_url}: {e}")

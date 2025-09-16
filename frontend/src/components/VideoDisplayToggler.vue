@@ -24,14 +24,14 @@ function setView(view: View) {
 
 <template>
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-    <!-- el tab for video/audio toggler in display -->
+    <!-- Media type filter tabs -->
     <el-tabs v-model:activeTab="activeTab" class="flex-grow">
       <el-tab-pane label="全部媒体" name="all" />
       <el-tab-pane label="视频文件" name="video" />
       <el-tab-pane label="音频文件" name="audio" />
     </el-tabs>
 
-    <!-- Grid/List toggler (emit update:viewType) -->
+    <!-- Grid/List view toggle buttons -->
     <div class="flex gap-1 bg-gray-100 p-1 rounded-lg">
       <el-button
         :class="

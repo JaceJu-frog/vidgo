@@ -1,4 +1,4 @@
-// src/types/media.d.ts
+// Type definitions for media-related data structures
 
 export interface Category {
   id: number
@@ -14,20 +14,20 @@ export interface Video {
   length: string
   last_modified: string
   description: string
-  type: 'video' // ★ 兼容联合类型
+  type: 'video' // Type discriminator for union types
 }
 
 export interface Collection {
   id: number
   name: string
   videos: Video[]
-  type: 'collection' // ★
+  type: 'collection' // Type discriminator for union types
   thumbnail: string
   cover?: string
   last_modified: string
 }
 
-export type MediaItem = Video | Collection // 用于Folder中展示
+export type MediaItem = Video | Collection // Union type for folder display
 
 export interface VideoInfoData {
   id: number
@@ -64,15 +64,15 @@ export interface RequestVideo {
   collectionCount: number
   duration: number
   owner: string
-  /** 新增：所有分 P 列表 */
+  /** List of all video parts/episodes */
   video_data: VideoPart[]
 }
 
-/** 单个分 P 的信息 */
+/** Information for a single video part/episode */
 export interface VideoPart {
   cid: number
   page: number
   part: string
   duration: number
-  // 如果还需要 first_frame / dimension 等字段，按需再补
+  // Additional fields like first_frame/dimension can be added as needed
 }

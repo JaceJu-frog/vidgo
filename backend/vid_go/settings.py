@@ -14,20 +14,20 @@ from pathlib import Path
 import os
 from urllib.parse import urlparse
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# 在项目内构建路径，如：BASE_DIR / 'subdir'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
+# 快速开发设置 - 不适用于生产环境
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# 安全警告：在生产环境中保持密钥秘密！
 SECRET_KEY = 'django-insecure-t*f^ky%62$)j_af*qs7)m&pwb-)1lgc&u22a^yj!e=6_@s@%dn'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# 安全警告：不要在生产环境中开启debug模式！
 DEBUG = True
 
-# Helper function to get environment variable as list
+# 辅助函数：获取环境变量作为列表
 def __get_list(env_var, default=None):
     """Get environment variable as a comma-separated list"""
     value = os.getenv(env_var)
@@ -38,46 +38,46 @@ def __get_list(env_var, default=None):
 # 允许承载server的 Host,这里全放通
 ALLOWED_HOSTS = __get_list('VIDGO_ALLOWED_HOSTS', ['*'])
 
-# Dynamic CORS and CSRF configuration
+# 动态CORS和CSRF配置
 CORS_ALLOWED_ORIGINS = __get_list(
     'VIDGO_CORS_ALLOWED_ORIGINS',
-    ["http://localhost:4173", "http://127.0.0.1:4173"]  # Default for development
+    ["http://localhost:4173", "http://127.0.0.1:4173"]  # 开发环境默认设置
 )
 
 CSRF_TRUSTED_ORIGINS = __get_list(
     'VIDGO_CSRF_TRUSTED_ORIGINS',
-    ["http://localhost:4173", "http://127.0.0.1:4173"]  # Default for development
+    ["http://localhost:4173", "http://127.0.0.1:4173"]  # 开发环境默认设置
 )
 
 # 全站 HTTPS 建议
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
-# Function to parse VIDGO_URL and automatically configure CORS, CSRF, and ALLOWED_HOSTS
+# 解析VIDGO_URL并自动配置CORS、CSRF和ALLOWED_HOSTS的函数
 def _parse_vidgo_url():
     """Parse VIDGO_URL environment variable and configure related settings"""
     global CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, ALLOWED_HOSTS
 
     url = os.getenv("VIDGO_URL")
     if url:
-        # Add to CSRF trusted origins
+        # 添加到CSRF可信来源
         if url not in CSRF_TRUSTED_ORIGINS:
             CSRF_TRUSTED_ORIGINS.append(url)
 
-        # Add to CORS allowed origins
+        # 添加到CORS允许来源
         if url not in CORS_ALLOWED_ORIGINS:
             CORS_ALLOWED_ORIGINS.append(url)
 
-        # Add hostname to ALLOWED_HOSTS
+        # 添加主机名到ALLOWED_HOSTS
         parsed_url = urlparse(url)
         hostname = parsed_url.hostname
         if hostname and hostname not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
             ALLOWED_HOSTS.append(hostname)
 
-# Parse VIDGO_URL if provided
+# 如果提供了VIDGO_URL则解析它
 _parse_vidgo_url()
 
-# Add development origins in DEBUG mode
+# 在DEBUG模式下添加开发环境来源
 if DEBUG:
     dev_origins = [
         "http://localhost:4173",
@@ -94,12 +94,12 @@ if DEBUG:
 # CORS 设置
 CORS_ALLOW_CREDENTIALS = True
 
-# Expose headers for file downloads
+# 为文件下载暴露头部
 CORS_EXPOSE_HEADERS = [
     "Content-Disposition",
 ]
 
-# Application definition
+# 应用程序定义
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -114,7 +114,7 @@ INSTALLED_APPS = [
 ]
 
 
-# Note: CORS_ALLOW_CREDENTIALS is already set above
+# 注意：CORS_ALLOW_CREDENTIALS已在上面设置
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -147,7 +147,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'vid_go.wsgi.application'
 
 
-# Database
+# 数据库配置
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
@@ -161,7 +161,7 @@ DATABASES = {
     # }
 }
 
-# Password validation
+# 密码验证
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -179,16 +179,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Media settings
+# 媒体设置
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # 指向项目根目录下的 media 文件夹
 MEDIA_URL = '/media/'  # 访问媒体的 URL 前缀
 
-# Large file upload settings for 18GB+ files
-DATA_UPLOAD_MAX_MEMORY_SIZE = None  # No limit on memory-based uploads
-FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100MB - files larger than this will be saved to temp files
-DATA_UPLOAD_MAX_NUMBER_FIELDS = None  # No limit on form fields
-# Internationalization
+# 18GB+大文件上传设置
+DATA_UPLOAD_MAX_MEMORY_SIZE = None  # 对基于内存的上传不限制
+FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100MB - 超过这个大小的文件将保存到临时文件
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None  # 对表单字段不限制
+# 国际化设置
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
@@ -200,17 +200,17 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# 静态文件（CSS、JavaScript、图像）
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 # 静态文件配置（确保已设置 STATIC_URL 和 STATICFILES_DIRS）
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]  # 静态文件存放目录
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # collectstatic 收集到的目录
 
-# Default primary key field type
+# 默认主键字段类型
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Custom user model
+# 自定义用户模型
 AUTH_USER_MODEL = 'accounts.User'

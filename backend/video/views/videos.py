@@ -1,7 +1,7 @@
 # views/videos.py
 from django.http import JsonResponse,HttpResponse,HttpResponseNotAllowed,HttpResponseNotFound,Http404,FileResponse,HttpRequest
 from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings  # Ensure this is at the top
+from django.conf import settings  # 确保这个在顶部
 from django.shortcuts import get_object_or_404,render
 from django.urls import reverse
 from .base import JsonView
@@ -17,11 +17,11 @@ def requires_delete_permission(func):
     """Decorator to check if user has permission to delete videos"""
     @wraps(func)
     def wrapper(self, request, *args, **kwargs):
-        # Check if user is authenticated
+        # 检查用户是否已认证
         if not hasattr(request, 'user') or not request.user.is_authenticated:
             return JsonResponse({'success': False, 'error': 'Authentication required'}, status=401)
         
-        # Check if user is root or has premium authority
+        # 检查用户是否为root或拥有高级权限
         if not (request.user.is_root or request.user.premium_authority):
             return JsonResponse({'success': False, 'error': 'Insufficient permissions. Only premium users can delete videos'}, status=403)
         
@@ -33,7 +33,7 @@ def get_user_combined_hidden_categories(request):
     if hasattr(request, 'user') and request.user.is_authenticated:
         return request.user.get_combined_hidden_categories()
     
-    # For unauthenticated users, check for hidden_categories parameter
+    # 对于未认证用户，检查hidden_categories参数
     hidden_category_ids = []
     if 'hidden_categories' in request.GET:
         try:
@@ -91,11 +91,11 @@ def delete_all_related_files(video):
     deleted_files = []
     errors = []
     
-    # Get base filename without extension for pattern matching
+    # 获取不含扩展名的基础文件名用于模式匹配
     base_filename = os.path.splitext(video.url)[0] if video.url else None
     video_id_str = str(video.id)
     
-    # 1. Delete main video/audio file
+    # 1. 删除主视频/音频文件
     if video.url:
         try:
             directory_name, _ = get_media_path_info(video.url)
@@ -110,7 +110,7 @@ def delete_all_related_files(video):
         except Exception as e:
             errors.append(f"Main file deletion failed: {e}")
     
-    # 2. Delete thumbnail 
+    # 2. 删除缩略图 
     if video.thumbnail_url:
         try:
             thumbnail_dir = os.path.join(settings.MEDIA_ROOT, 'thumbnail')
@@ -124,7 +124,7 @@ def delete_all_related_files(video):
         except Exception as e:
             errors.append(f"Thumbnail deletion failed: {e}")
     
-    # 3. Delete subtitle files
+    # 3. 删除字幕文件
     if video.srt_path:
         try:
             srt_dir = os.path.join(settings.MEDIA_ROOT, 'saved_srt')
@@ -138,7 +138,7 @@ def delete_all_related_files(video):
         except Exception as e:
             errors.append(f"SRT file deletion failed: {e}")
     
-    # 4. Delete translated subtitle files
+    # 4. 删除翻译字幕文件
     if video.translated_srt_path:
         try:
             translated_srt_dir = os.path.join(settings.MEDIA_ROOT, 'saved_srt')
@@ -152,12 +152,12 @@ def delete_all_related_files(video):
         except Exception as e:
             errors.append(f"Translated SRT file deletion failed: {e}")
     
-    # 5. Delete waveform data (based on video filename pattern)
+    # 5. 删除波形数据（基于视频文件名模式）
     if base_filename:
         try:
             waveform_dir = os.path.join(settings.MEDIA_ROOT, 'waveform_data')
             if os.path.exists(waveform_dir):
-                # Look for waveform files with matching base filename
+                # 查找匹配基础文件名的波形文件
                 waveform_pattern = f"{base_filename}.json"
                 waveform_path = os.path.join(waveform_dir, waveform_pattern)
                 
@@ -169,12 +169,12 @@ def delete_all_related_files(video):
         except Exception as e:
             errors.append(f"Waveform file deletion failed: {e}")
     
-    # 6. Delete audio files with same base filename in saved_audio/
+    # 6. 删除saved_audio/中相同基础文件名的音频文件
     if base_filename:
         try:
             audio_dir = os.path.join(settings.MEDIA_ROOT, 'saved_audio')
             if os.path.exists(audio_dir):
-                # Look for audio files that match the base filename
+                # 查找匹配基础文件名的音频文件
                 audio_extensions = ['.mp3', '.m4a', '.aac', '.wav', '.flac', '.alac']
                 for ext in audio_extensions:
                     audio_filename = f"{base_filename}{ext}"
@@ -187,12 +187,12 @@ def delete_all_related_files(video):
         except Exception as e:
             errors.append(f"Audio file deletion failed: {e}")
     
-    # 7. Delete stream video files (look for files with same base name)
+    # 7. 删除流视频文件（查找相同基础名称的文件）
     if base_filename:
         try:
             stream_dir = os.path.join(settings.MEDIA_ROOT, 'stream_video')
             if os.path.exists(stream_dir):
-                # Look for any files in stream_video that match the base filename
+                # 查找stream_video中匹配基础文件名的任意文件
                 for file in os.listdir(stream_dir):
                     if file.startswith(base_filename):
                         stream_path = os.path.join(stream_dir, file)
@@ -202,11 +202,11 @@ def delete_all_related_files(video):
         except Exception as e:
             errors.append(f"Stream video deletion failed: {e}")
     
-    # 8. Delete screenshot files (look for files containing video ID)
+    # 8. 删除截图文件（查找包含视频ID的文件）
     try:
         screenshot_dir = os.path.join(settings.MEDIA_ROOT, 'screenshot')
         if os.path.exists(screenshot_dir):
-            # Look for screenshot files that contain the video ID
+            # 查找包含视频ID的截图文件
             for file in os.listdir(screenshot_dir):
                 if video_id_str in file or (base_filename and base_filename in file):
                     screenshot_path = os.path.join(screenshot_dir, file)
@@ -216,13 +216,13 @@ def delete_all_related_files(video):
     except Exception as e:
         errors.append(f"Screenshot deletion failed: {e}")
     
-    # 9. Delete attachment files for this video
+    # 9. 删除该视频的附件文件
     try:
         from ..models import VideoAttachment
         attachments = VideoAttachment.objects.filter(video=video)
         for attachment in attachments:
             try:
-                if attachment.delete_file():  # Use the model's delete_file method
+                if attachment.delete_file():  # 使用模型的delete_file方法
                     deleted_files.append(f"attachments/{attachment.file_path}")
                 else:
                     print(f"[WARN] Attachment file not found: {attachment.file_path}")
@@ -231,7 +231,7 @@ def delete_all_related_files(video):
     except Exception as e:
         errors.append(f"Attachment query failed: {e}")
     
-    # Log results
+    # 记录结果
     if deleted_files:
         print(f"[INFO] Deleted {len(deleted_files)} files for video {video.id}: {deleted_files}")
     if errors:
@@ -432,7 +432,7 @@ class VideoInfoView(JsonView):
         """
         try:
             video = Video.objects.get(url=filename)
-            # Get the correct media path based on file extension
+            # 根据文件扩展名获取正确的媒体路径
             directory_name, url_prefix = get_media_path_info(video.url)
             return self.json_ok({
                 'id': video.id,
@@ -442,7 +442,7 @@ class VideoInfoView(JsonView):
                 'description': video.description,
                 'videoLength': video.video_length,
                 'lastModified': calc_diff_time(video.last_modified),
-                'rawLang': video.raw_lang  # Add raw_lang field
+                'rawLang': video.raw_lang  # 添加raw_lang字段
             })
         except Video.DoesNotExist:
             return self.json_err('Video not found', status=404)
@@ -756,13 +756,13 @@ class VideoActionView(View):
                 status=404
             )
         
-        # Delete all related files (video, audio, thumbnail, subtitles, waveform, screenshots, attachments, etc.)
+        # 删除所有相关文件（视频、音频、缩略图、字幕、波形、截图、附件等）
         deleted_files, errors = delete_all_related_files(video)
         
-        # Delete the database record
+        # 删除数据库记录
         video.delete()
         
-        # Prepare response with deletion summary
+        # 准备包含删除摘要的响应
         message = f'Video deleted successfully. Removed {len(deleted_files)} related files.'
         if errors:
             message += f' {len(errors)} files had deletion errors (see logs).'
@@ -885,7 +885,7 @@ class VideoActionView(View):
             raise Http404("Media file not found")
         
         # 构建媒体文件 URL (使用 Django URL 反向解析)
-        # Get the correct media type for URL construction
+        # 获取用于URL构建的正确媒体类型
         _, url_prefix = get_media_path_info(absolute_path)
         video_path = request.build_absolute_uri(
             reverse('video:serve_media', args=[url_prefix, absolute_path])
@@ -970,12 +970,12 @@ class VideoActionView(View):
 
         video.category = target_category
         
-        # Check if current collection belongs to target category
+        # 检查当前合集是否属于目标分类
         if video.collection:
-            # Clear collection if:
-            # 1. Moving to uncategorized (target_category is None) and collection has a category
-            # 2. Collection belongs to a different category than target
-            # 3. Collection has no category but moving to a specific category
+            # 清除合集如果：
+            # 1. 移动到未分类（target_category为None）且合集有分类
+            # 2. 合集属于与目标不同的分类
+            # 3. 合集没有分类但要移动到特定分类
             if ((target_category is None and video.collection.category_id is not None) or
                 (target_category is not None and video.collection.category_id != target_category.id)):
                 video.collection = None

@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.db import transaction
 from .models import Video
 from utils.split_subtitle.main import optimise_srt
-from django.conf import settings  # Ensure this is at the top
+from django.conf import settings  # 确保这个在顶部
 import hashlib
 from .views.set_setting import load_all_settings
 """
@@ -36,7 +36,7 @@ external_task_status = defaultdict(lambda: {
     "audio_file_path": "",
     "task_type": "external",  # 标识为外部任务
     "created_at": 0,
-    "status": "Queued",  # Queued, Running, Completed, Failed
+    "status": "Queued",  # 队列中、运行中、已完成、失败
     "result_file": "",
     "error_message": "",
 })
@@ -45,8 +45,8 @@ external_task_status = defaultdict(lambda: {
 # stages = 0: 字级时间戳 1: 大模型优化 2: 翻译
 subtitle_task_status = defaultdict(lambda: {
     "filename": "",
-    "src_lang": "None",  
-    "trans_lang": "None",  # Language to be translated into None(means no translation),zh,en,jp.
+    "src_lang": "None",
+    "trans_lang": "None",  # 要翻译成的语言 None(表示不翻译),zh,en,jp
     "video_id": 0,
     "stages": {
         "transcribe":  "Queued",
