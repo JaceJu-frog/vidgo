@@ -12,43 +12,43 @@ def generate_waveform_peaks(
     bit_depth: int = 16
 ) -> List[float]:
     """
-    为音频文件生成波形峰值数据用于前端可视化展示
-    
+    Generate waveform peak data for audio files for frontend visualization
+
     Args:
-        audio_path: 音频文件路径
-        output_path: 可选的JSON输出文件路径，如果不提供则自动生成
-        samples_per_second: 每秒采样数（控制波形精度）
-        bit_depth: 音频位深度
-        
+        audio_path: Path to audio file
+        output_path: Optional JSON output file path, auto-generated if not provided
+        samples_per_second: Samples per second (controls waveform precision)
+        bit_depth: Audio bit depth
+
     Returns:
-        List[float]: 峰值数据数组，每个值范围在[-1.0, 1.0]
-        
+        List[float]: Peak data array, each value in range [-1.0, 1.0]
+
     Raises:
-        FileNotFoundError: 音频文件不存在
-        subprocess.CalledProcessError: FFmpeg处理失败
+        FileNotFoundError: Audio file does not exist
+        subprocess.CalledProcessError: FFmpeg processing failed
     """
     if not os.path.exists(audio_path):
         raise FileNotFoundError(f"Audio file not found: {audio_path}")
     
-    # 生成输出路径
+    # Generate output path
     if output_path is None:
         base_name = os.path.splitext(os.path.basename(audio_path))[0]
         output_dir = os.path.join(os.path.dirname(audio_path), "..", "waveform_data")
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, f"{base_name}.peaks.json")
     
-    # 获取音频信息
+    # Get audio information
     duration = _get_audio_duration(audio_path)
     if duration <= 0:
         raise ValueError(f"Invalid audio duration: {duration}")
     
-    # 使用FFmpeg提取音频数据
+    # Extract audio data using FFmpeg
     raw_audio_data = _extract_audio_data(audio_path, samples_per_second)
     
-    # 计算峰值数据
+    # Calculate peak data
     peaks = _calculate_peaks(raw_audio_data, samples_per_second, duration)
     
-    # 保存峰值数据到JSON文件
+    # Save peak data to JSON file
     peak_data = {
         "version": "1.0",
         "audio_file": os.path.basename(audio_path),
@@ -66,7 +66,7 @@ def generate_waveform_peaks(
 
 
 def _get_audio_duration(audio_path: str) -> float:
-    """获取音频时长（秒）"""
+    """Get audio duration in seconds"""
     cmd = [
         'ffprobe', 
         '-v', 'quiet',
@@ -83,13 +83,13 @@ def _get_audio_duration(audio_path: str) -> float:
 
 
 def _extract_audio_data(audio_path: str, sample_rate: int) -> np.ndarray:
-    """使用FFmpeg提取音频原始数据"""
+    """Extract raw audio data using FFmpeg"""
     cmd = [
         'ffmpeg',
         '-i', audio_path,
-        '-f', 'f32le',  # 32位浮点格式
-        '-ac', '1',     # 单声道
-        '-ar', str(sample_rate * 100),  # 足够的采样率用于后续下采样
+        '-f', 'f32le',  # 32-bit float format
+        '-ac', '1',     # Mono channel
+        '-ar', str(sample_rate * 100),  # High sample rate for subsequent downsampling
         '-'
     ]
     
@@ -101,7 +101,7 @@ def _extract_audio_data(audio_path: str, sample_rate: int) -> np.ndarray:
             check=True
         )
         
-        # 将字节数据转换为float32数组
+        # Convert byte data to float32 array
         audio_data = np.frombuffer(result.stdout, dtype=np.float32)
         return audio_data
         
@@ -110,24 +110,24 @@ def _extract_audio_data(audio_path: str, sample_rate: int) -> np.ndarray:
 
 
 def _calculate_peaks(audio_data: np.ndarray, samples_per_second: int, duration: float) -> List[float]:
-    """从原始音频数据计算峰值"""
+    """Calculate peaks from raw audio data"""
     if len(audio_data) == 0:
         return []
     
-    # 计算每个峰值点对应的音频样本数
+    # Calculate audio samples per peak point
     total_samples = len(audio_data)
     target_peaks = int(duration * samples_per_second)
     samples_per_peak = total_samples // target_peaks if target_peaks > 0 else total_samples
     
     peaks = []
     
-    # 分段计算峰值
+    # Calculate peaks by segments
     for i in range(0, total_samples, samples_per_peak):
         segment = audio_data[i:i + samples_per_peak]
         if len(segment) > 0:
-            # 使用RMS值作为峰值（比简单的max更平滑）
+            # Use RMS value as peak (smoother than simple max)
             rms = np.sqrt(np.mean(segment ** 2))
-            # 限制在[-1.0, 1.0]范围内
+            # Clamp to [-1.0, 1.0] range
             peak = np.clip(rms, -1.0, 1.0)
             peaks.append(float(peak))
     
@@ -136,19 +136,19 @@ def _calculate_peaks(audio_data: np.ndarray, samples_per_second: int, duration: 
 
 def get_waveform_for_file(filename: str) -> Optional[dict]:
     """
-    为给定的音频或视频文件名获取或生成波形数据
-    
+    Get or generate waveform data for a given audio or video filename
+
     Args:
-        filename: 文件名（不含路径，包含扩展名），可以是音频或视频文件
-        
+        filename: Filename (without path, with extension), can be audio or video file
+
     Returns:
-        dict: 包含波形数据的字典，如果失败则返回None
+        dict: Dictionary containing waveform data, None if failed
     """
-    # 构建完整路径 - 先尝试音频目录，再尝试视频目录
+    # Build full path - try audio directory first, then video directory
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.join(current_dir, "..", "..")
     
-    # 检查文件扩展名决定优先搜索目录
+    # Check file extension to determine priority search directory
     file_extension = os.path.splitext(filename)[1].lower()
     audio_formats = ['.mp3', '.m4a', '.aac', '.wav', '.flac', '.alac']
     video_formats = ['.mp4', '.avi', '.mov', '.mkv', '.webm']
@@ -156,31 +156,31 @@ def get_waveform_for_file(filename: str) -> Optional[dict]:
     file_path = None
     
     if file_extension in audio_formats:
-        # 音频文件，先检查saved_audio目录
+        # Audio file, check saved_audio directory first
         audio_path = os.path.join(project_root, "media", "saved_audio", filename)
         audio_path = os.path.normpath(audio_path)
         if os.path.exists(audio_path):
             file_path = audio_path
         else:
-            # 也检查saved_video目录（以防音频文件被放在那里）
+            # Also check saved_video directory (in case audio file is stored there)
             video_path = os.path.join(project_root, "media", "saved_video", filename)
             video_path = os.path.normpath(video_path)
             if os.path.exists(video_path):
                 file_path = video_path
     elif file_extension in video_formats:
-        # 视频文件，先检查saved_video目录
+        # Video file, check saved_video directory first
         video_path = os.path.join(project_root, "media", "saved_video", filename)
         video_path = os.path.normpath(video_path)
         if os.path.exists(video_path):
             file_path = video_path
         else:
-            # 也检查saved_audio目录（以防视频文件被放在那里）
+            # Also check saved_audio directory (in case video file is stored there)
             audio_path = os.path.join(project_root, "media", "saved_audio", filename)
             audio_path = os.path.normpath(audio_path)
             if os.path.exists(audio_path):
                 file_path = audio_path
     else:
-        # 未知格式，尝试两个目录
+        # Unknown format, try both directories
         for dir_name in ["saved_audio", "saved_video"]:
             test_path = os.path.join(project_root, "media", dir_name, filename)
             test_path = os.path.normpath(test_path)
@@ -192,14 +192,14 @@ def get_waveform_for_file(filename: str) -> Optional[dict]:
         print(f"Audio/Video file not found in saved_audio or saved_video: {filename}")
         return None
     
-    # 检查是否已有峰值数据
+    # Check if peak data already exists
     base_name = os.path.splitext(filename)[0]
     waveform_dir = os.path.join(project_root, "media", "waveform_data")
     os.makedirs(waveform_dir, exist_ok=True)
     peaks_path = os.path.join(waveform_dir, f"{base_name}.peaks.json")
     peaks_path = os.path.normpath(peaks_path)
     
-    # 如果峰值文件不存在或比音频/视频文件旧，则重新生成
+    # If peak file doesn't exist or is older than audio/video file, regenerate
     if not os.path.exists(peaks_path) or os.path.getmtime(peaks_path) < os.path.getmtime(file_path):
         try:
             generate_waveform_peaks(file_path, peaks_path)
@@ -207,7 +207,7 @@ def get_waveform_for_file(filename: str) -> Optional[dict]:
             print(f"Failed to generate waveform peaks: {e}")
             return None
     
-    # 读取峰值数据
+    # Read peak data
     try:
         with open(peaks_path, 'r', encoding='utf-8') as f:
             return json.load(f)
@@ -217,7 +217,7 @@ def get_waveform_for_file(filename: str) -> Optional[dict]:
 
 
 if __name__ == "__main__":
-    # 测试函数
+    # Test function
     test_audio = "一部关于糖的电影---最甜蜜的慢性杀手就在我们身边(双语字幕).mp3"
     result = get_waveform_for_file(test_audio)
     if result:

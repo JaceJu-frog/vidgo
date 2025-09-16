@@ -1,4 +1,4 @@
-# 将秒转换为 SRT 时间格式的函数
+# Function to convert seconds to SRT time format
 def seconds_to_srt_time(seconds):
     hours = int(seconds // 3600)
     minutes = int((seconds % 3600) // 60)

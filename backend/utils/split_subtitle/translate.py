@@ -169,7 +169,7 @@ import logging
 from typing import Optional
 import openai
 
-# Add the project root to the path to import from video.views.set_setting
+# 将项目根目录添加到路径以从video.views.set_setting导入
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 from video.views.set_setting import load_all_settings
 from utils.split_subtitle.ASRData import ASRData

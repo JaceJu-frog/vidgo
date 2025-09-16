@@ -67,7 +67,7 @@ def merge_segments_based_on_sentences(asr_data: ASRData, sentences: List[str]) -
     threshold = 0.5  # 相似度阈值
     max_shift = 10   # 滑动窗口的最大偏移量
 
-    new_segments = []  # Now stores List[List[ASRDataSeg]] to preserve token timing
+    new_segments = []  # 存储List[List[ASRDataSeg]]以保留token时间信息
 
     for sentence in sentences:
         logger.info(f"[+] 处理句子: {sentence}")
@@ -216,7 +216,7 @@ def split_segment_by_display_length(seg_list: List[ASRDataSeg]) -> List[ASRDataS
             best_split_idx = i
     
     # 如果没有找到合适的分割点或时间差太小，使用中点
-    if best_split_idx == -1 or max_time_diff < 50:  # 50ms as threshold
+    if best_split_idx == -1 or max_time_diff < 50:  # 50毫秒作为阈值
         best_split_idx = n // 2
     
     # 根据找到的分割点分割
@@ -267,9 +267,9 @@ def merge_short_segments_iteratively(segments: List[ASRDataSeg]) -> List[ASRData
                         merged_text,
                         prev_seg.start_time,
                         seg.end_time,
-                        "",  # direct
-                        "",  # free
-                        ""   # reflected
+                        "",  # 直接翻译
+                        "",  # 自由翻译
+                        ""   # 反思翻译
                     )
                     result[i - 1:i + 1] = [merged_seg]
                     changed = True
@@ -283,9 +283,9 @@ def merge_short_segments_iteratively(segments: List[ASRDataSeg]) -> List[ASRData
                         merged_text,
                         seg.start_time,
                         next_seg.end_time,
-                        "",  # direct
-                        "",  # free
-                        ""   # reflected
+                        "",  # 直接翻译
+                        "",  # 自由翻译
+                        ""   # 反思翻译
                     )
                     result[i:i + 2] = [merged_seg]
                     changed = True
@@ -445,7 +445,7 @@ def optimise_srt(
     settings = load_all_settings()
     use_proxy = settings.get('DEFAULT', {}).get('use_proxy', 'true').lower() == 'true'
     if not use_proxy:
-        # disable HTTP(S) proxies for requests
+        # 禁用HTTP(S)代理请求
         os.environ.pop('http_proxy', None)
         os.environ.pop('https_proxy', None)
     from utils.llm_engines import ENGINES
@@ -578,7 +578,7 @@ def translate_srt(raw_srt_path,
     final_asr_data = two_step_translate(raw_asr_data, use_cache=use_translation_cache, num_threads=num_threads, batch_size=batch_size, source_lang=raw_lang, target_lang=target_lang, terms_to_note=terms_to_note)
     logger.info("字幕翻译完成")
     
-    # Save translated subtitles if translated_save_path is provided
+    # 如果提供了翻译保存路径，则保存翻译字幕
     if translate_srt_path:
         final_asr_data.to_srt(save_path=translate_srt_path, use_translation=True)
         logger.info(f"保存翻译字幕: {translate_srt_path}")

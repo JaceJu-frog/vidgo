@@ -9,7 +9,7 @@ class JsonView(View):
     • Has shortcuts self.json_ok / self.json_err
     """
     data: dict = {}
-    # 分流这个域名收到的action.
+    # Route actions received by this domain
     def dispatch(self, request, *args, **kwargs):
         if request.body:
             try:

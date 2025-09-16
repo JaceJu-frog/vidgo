@@ -423,8 +423,8 @@ class TranscriptionEngineFactory:
                 'quality': 'High'
             },
             'remote_vidgo': {
-                'name': '远程VidGo字幕服务',
-                'description': '用户可在高性能主机中部署VidGo实例，并通过IP/域名链接，调用后端的字幕识别服务。',
+                'name': 'Remote VidGo Subtitle Service',
+                'description': 'Users can deploy VidGo instances on high-performance hosts and call backend subtitle recognition services via IP/domain links.',
                 'type': 'remote',
                 'languages': 'Multi-language',
                 'requires_api_key': False,

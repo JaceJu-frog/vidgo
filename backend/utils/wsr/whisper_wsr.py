@@ -28,15 +28,15 @@ print("\nWord-level timestamps:")
 
 def transcribe_audio_openai(audio_file_path: str, api_key: str, base_url: str = "https://api.openai.com/v1") -> str:
     """
-    使用OpenAI Whisper API进行音频转录
-    
+    Transcribe audio using OpenAI Whisper API
+
     Args:
-        audio_file_path: 音频文件路径
-        api_key: OpenAI API密钥
-        base_url: API基础URL
-        
+        audio_file_path: Path to audio file
+        api_key: OpenAI API key
+        base_url: API base URL
+
     Returns:
-        SRT格式的转录结果
+        Transcription result in SRT format
     """
     from openai import OpenAI
     
@@ -53,12 +53,12 @@ def transcribe_audio_openai(audio_file_path: str, api_key: str, base_url: str = 
             timestamp_granularities=["word"]
         )
     
-    # 转换为SRT格式
+    # Convert to SRT format
     return _convert_whisper_to_srt(transcription.words)
 
 
 def _convert_whisper_to_srt(words) -> str:
-    """将OpenAI Whisper的词级时间戳转换为SRT格式"""
+    """Convert OpenAI Whisper word-level timestamps to SRT format"""
     from utils.video.time_convert import seconds_to_srt_time
     
     srt_content = ""
@@ -72,7 +72,7 @@ def _convert_whisper_to_srt(words) -> str:
     return srt_content
 
 
-# ===== 使用示例 =====
+# ===== Usage Example =====
 # srt_output = transcribe_audio_openai("audio.mp3", "your_api_key")
 # with open("output.srt", "w", encoding="utf-8") as f:
 #     f.write(srt_output)

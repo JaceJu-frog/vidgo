@@ -9,7 +9,7 @@ import logging
 from utils.split_subtitle.cnt_tokens import count_words
 from utils.split_subtitle.prompt import VIDEO_SPLIT_PROMPT_TEMPLATE 
 
-# Add the project root to the path to import from video.views.set_setting
+# 将项目根目录添加到路径以从video.views.set_setting导入
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 logger = logging.getLogger('subtitle_split')
@@ -88,10 +88,10 @@ def split_by_llm(text: str,
     #     if cached_result:
     #         print(f"[+] 从缓存中获取结果: {cached_result}")
     #         return cached_result
-    word_limit=30 # max 
+    word_limit=30 # 最大词数限制
     # 初始化OpenAI客户端
     client = openai.OpenAI(api_key=api_key, base_url=base_url)
-    SYSTEM_PROMPT = f"Use <br> for the split of paragraph"
+    SYSTEM_PROMPT = f"使用<br>进行段落分割"
     total_word_count = count_words(text)
     logger.info(f"total_word_count{total_word_count}")
     prompt = VIDEO_SPLIT_PROMPT_TEMPLATE.format(
@@ -107,7 +107,7 @@ def split_by_llm(text: str,
             ],
             temperature=0.1
         )
-        result = response.choices[0].message.content # 获取LLM返回的内容（OPENAI格式）
+        result = response.choices[0].message.content # 获取LLM返回的内容（OpenAI格式）
         # result = result[7:-3] # 清理结果中的多余```json和```
         json_data = json.loads(result)
         logger.info(f"[+] LLM返回结果: {json_data}")

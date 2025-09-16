@@ -7,7 +7,7 @@ import os
 
 # 加载模型
 # model = WhisperModel("large-v2",device="cuda")  # 根据需要选择设备和计算类型
-# model = WhisperModel("/path/to/local/model", device="cpu")  # Adjust device as needed
+# model = WhisperModel("/path/to/local/model", device="cpu")  # 根据需要调整设备
 # 找一下它在本地的位置，这里似乎默认用网络，我需要本地的模型
 # -------- 全局单例 & 懒加载 --------
 _MODEL: Optional[WhisperModel] = None
@@ -107,7 +107,7 @@ def transcribe_audio(audio_file_path: str,
     model = get_model()  # 懒加载
     params = get_multilingual_transcription_params()
     
-    # Override language parameter if specified by user
+    # 如果用户指定了语言，则覆盖语言参数
     if language and language != "None":
         params['language'] = language
         print(f"[faster_whisper] Using user-specified language: {language}")
@@ -134,7 +134,7 @@ def transcribe_audio(audio_file_path: str,
         **params
     )
     
-    # Log language detection and transcription info
+    # 记录语言检测和转录信息
     print(f"[faster_whisper] Language detection result: {info.language}")
     print(f"[faster_whisper] Language probability: {info.language_probability:.3f}")
     print(f"[faster_whisper] Parameters used - language: {params.get('language', 'None (auto-detect)')}")

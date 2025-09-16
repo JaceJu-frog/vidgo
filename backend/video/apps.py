@@ -11,14 +11,14 @@ class VideoConfig(AppConfig):
         if getattr(self, "_worker_started", False):
             return
 
-        from .tasks import process_next_task,process_download_task,process_export_task  # 延迟导入防止循环
+        from .tasks import process_next_task,process_download_task,process_export_task  # Late import to prevent circular dependency
 
         def _subtitle_worker():
             while True:
                 try:
                     connection.close_if_unusable_or_obsolete()
                     process_next_task()
-                    time.sleep(1 + random.random())  # 随机抖动
+                    time.sleep(1 + random.random())  # Random jitter
                 except Exception as e:
                     print("Task worker error:", e)
                     time.sleep(5)
@@ -27,7 +27,7 @@ class VideoConfig(AppConfig):
                 try:
                     connection.close_if_unusable_or_obsolete()
                     process_download_task()
-                    time.sleep(1 + random.random())  # 随机抖动
+                    time.sleep(1 + random.random())  # Random jitter
                 except Exception as e:
                     print("Task worker error:", e)
                     time.sleep(5)
@@ -36,7 +36,7 @@ class VideoConfig(AppConfig):
                 try:
                     connection.close_if_unusable_or_obsolete()
                     process_export_task()
-                    time.sleep(1 + random.random())  # 随机抖动
+                    time.sleep(1 + random.random())  # Random jitter
                 except Exception as e:
                     print("Export worker error:", e)
                     time.sleep(5)

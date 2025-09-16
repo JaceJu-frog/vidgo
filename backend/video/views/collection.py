@@ -24,19 +24,19 @@ class CollectionActionView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, collection_id):
-        if self.action == 'create':# 创建合集，collection_id是0.
+        if self.action == 'create':# Create collection, collection_id is 0.
             return self.upload(request, collection_id)
         elif self.action == 'delete':
             return self.delete(request, collection_id)
         elif self.action == 'rename':
             return self.rename(request, collection_id)
-        elif self.action == 'move_category': # 移动Collection的分类
+        elif self.action == 'move_category': # Move Collection's category
             return self.move_category(request, collection_id)
         elif self.action == 'update_thumbnail':
             return self.update_thumbnail(request, collection_id)
         elif self.action == 'update':
             return self.update_collection(request, collection_id)
-        # 其它动作不允许 POST
+        # Other actions not allowed for POST
         return HttpResponseNotAllowed(['POST'])
 
     def get(self, request, collection_id):
@@ -47,19 +47,19 @@ class CollectionActionView(View):
         elif self.action == 'videos':
             return self.get_collection_videos(request, collection_id)
         
-    # ---------- 列出所有Collections，可以选择collection，或者反选，排除部分Category中的内容 ----------
+    # ---------- List all Collections, can select collection or exclude content from certain Categories ----------
     def list_all(self, request):
         """
-        列出所有Collections，可按Category筛选
+        List all Collections, can filter by Category
         """
         category_id = request.GET.get('category_id')
         
-        # 获取用户的组合隐藏分类ID列表（系统设置 + 用户自定义）
+        # Get user's combined hidden category ID list (system settings + user customization)
         hidden_category_ids = get_user_combined_hidden_categories(request)
         
-        # 构建查询条件
+        # Build query conditions
         if category_id:
-            if category_id == '0':  # 0表示无分类
+            if category_id == '0':  # 0 means no category
                 collections = Collection.objects.filter(category__isnull=True)
             else:
                 try:
@@ -71,11 +71,11 @@ class CollectionActionView(View):
         else:
             collections = Collection.objects.all()
         
-        # 过滤掉属于隐藏分类的合集
+        # Filter out collections belonging to hidden categories
         if hidden_category_ids:
             collections = collections.exclude(category_id__in=hidden_category_ids)
         
-        # 按最后修改时间倒序排列
+        # Sort by last modified time in descending order
         collections = collections.order_by('-last_modified')
         
         collection_list = []
@@ -125,10 +125,10 @@ class CollectionActionView(View):
             status=200
         )
     
-    # ---------- 查询Collection详细信息 ----------
+    # ---------- Query Collection details ----------
     def query(self, request, collection_id):
         """
-        查询Collection详细信息，包括其关联的视频列表
+        Query Collection details, including its associated video list
         """
         try:
             collection = Collection.objects.get(pk=collection_id)
@@ -137,7 +137,7 @@ class CollectionActionView(View):
                 {"success": False, "message": "Collection not found"}, status=404
             )
         
-        # 获取Collection下的所有视频
+        # Get all videos under the Collection
         videos = collection.videos.all()
         video_list = []
         for video in videos:
@@ -182,29 +182,29 @@ class CollectionActionView(View):
         if not file.name:
             return JsonResponse({"error": "No selected file"}, status=400)
 
-        # 1. 取得目标 Collection
+        # 1. Get target Collection
         try:
             collection = Collection.objects.get(pk=collection_id)
         except Collection.DoesNotExist:
             return JsonResponse({"error": "Collection not found"}, status=404)
 
-        # 2. 生成保存路径
+        # 2. Generate save path
         # thumb_dir = os.path.join(settings.MEDIA_ROOT, "collection_thumbnail")
         thumb_dir = os.path.join(settings.MEDIA_ROOT, "thumbnail")
         os.makedirs(thumb_dir, exist_ok=True)
 
         ext = os.path.splitext(file.name)[1] or ".jpg"
-        # 使用collection url作为缩略图文件名，防止重复
-        filename = os.path.splitext(os.path.basename(collection.name))[0]  # 获取文件名，不包含扩展名
+        # Use collection url as thumbnail filename to prevent duplicates
+        filename = os.path.splitext(os.path.basename(collection.name))[0]  # Get filename without extension
         thumb_filename = f"{filename}{ext}"
         thumb_path = os.path.join(thumb_dir, thumb_filename)
 
-        # 3. 写入文件
+        # 3. Write file
         with open(thumb_path, "wb+") as dst:
             for chunk in file.chunks():
                 dst.write(chunk)
 
-        # 4. 更新模型
+        # 4. Update model
         collection.thumbnail_url = thumb_filename
         collection.last_modified = timezone.now()
         collection.save(update_fields=["thumbnail_url", "last_modified"])
@@ -213,7 +213,7 @@ class CollectionActionView(View):
             {"success": True, "thumbnail_url": thumb_filename}, status=200
         )
 
-    # ---------- 删除合集 ----------
+    # ---------- Delete collection ----------
     def delete(self, request, collection_id):
         """
         只有当 Collection 不含任何 Video 时才允许物理删除。
@@ -225,7 +225,7 @@ class CollectionActionView(View):
                 {"success": False, "message": "Collection not found"}, status=404
             )
 
-        # 0️⃣ 先检查是否有视频
+        # 0️⃣ First check if there are any videos
         if target.videos.exists():
             return JsonResponse(
                 {
@@ -240,7 +240,7 @@ class CollectionActionView(View):
             {"success": True, "message": "Collection deleted successfully"}, status=200
         )
 
-    # ---------- 创建合集 ----------
+    # ---------- Create collection ----------
     def upload(self, request, collection_id):
         """
         创建新的Collection。需要name参数，可选category_id (默认0表示无分类)。
@@ -254,22 +254,22 @@ class CollectionActionView(View):
             )
 
         collection_name = data.get('name', '').strip()
-        category_id = data.get('category_id', 0)  # 默认0表示无分类
+        category_id = data.get('category_id', 0)  # Default 0 means no category
 
         if not collection_name:
             return JsonResponse(
                 {"success": False, "message": "Collection name is required"}, status=400
             )
 
-        # 检查Collection名称是否已存在
+        # Check if Collection name already exists
         if Collection.objects.filter(name=collection_name).exists():
             return JsonResponse(
                 {"success": False, "message": "Collection with this name already exists"}, status=400
             )
 
-        # 处理分类绑定
+        # Handle category binding
         category = None
-        if category_id != 0:  # 0表示无分类
+        if category_id != 0:  # 0 means no category
             try:
                 category = Category.objects.get(pk=category_id)
             except Category.DoesNotExist:
@@ -277,11 +277,11 @@ class CollectionActionView(View):
                     {"success": False, "message": "Category not found"}, status=404
                 )
 
-        # 创建Collection (ID会自动从1开始递增)
+        # Create Collection (ID will automatically increment from 1)
         try:
             collection = Collection.objects.create(
                 name=collection_name,
-                category=category,  # None表示无分类
+                category=category,  # None means no category
                 last_modified=timezone.now()
             )
             
@@ -303,7 +303,7 @@ class CollectionActionView(View):
                 {"success": False, "message": f"Failed to create collection: {str(e)}"}, status=500
             )
 
-    # ---------- 移动Collection到其他Category ----------
+    # ---------- Move Collection to other Category ----------
     def move_category(self, request, collection_id):
         """
         移动Collection到其他Category
@@ -324,9 +324,9 @@ class CollectionActionView(View):
                 {"success": False, "message": "Collection not found"}, status=404
             )
 
-        # 处理新分类
+        # Handle new category
         new_category = None
-        if new_category_id != 0:  # 0表示无分类
+        if new_category_id != 0:  # 0 means no category
             try:
                 new_category = Category.objects.get(pk=new_category_id)
             except Category.DoesNotExist:
@@ -359,7 +359,7 @@ class CollectionActionView(View):
             "videos_updated": videos_updated
         }, status=200)
 
-    # ---------- 通用更新Collection信息 ----------
+    # ---------- Generic update Collection information ----------
     def update_collection(self, request, collection_id):
         """
         通用更新Collection信息 (name, category等)
@@ -378,17 +378,17 @@ class CollectionActionView(View):
                 {"success": False, "message": "Collection not found"}, status=404
             )
 
-        # 更新字段
+        # Update fields
         updated_fields = ["last_modified"]
         
-        # 更新名称
+        # Update name
         if 'name' in data:
             new_name = data['name'].strip()
             if not new_name:
                 return JsonResponse(
                     {"success": False, "message": "Collection name cannot be empty"}, status=400
                 )
-            # 检查名称是否已存在（排除当前Collection）
+            # Check if name already exists (excluding current Collection)
             if Collection.objects.filter(name=new_name).exclude(pk=collection_id).exists():
                 return JsonResponse(
                     {"success": False, "message": "Collection with this name already exists"}, status=400
@@ -396,10 +396,10 @@ class CollectionActionView(View):
             collection.name = new_name
             updated_fields.append("name")
 
-        # 更新分类
+        # Update category
         if 'category_id' in data:
             category_id = data['category_id']
-            if category_id == 0:  # 0表示无分类
+            if category_id == 0:  # 0 means no category
                 collection.category = None
             else:
                 try:
@@ -411,7 +411,7 @@ class CollectionActionView(View):
                     )
             updated_fields.append("category")
 
-        # 更新最后修改时间
+        # Update last modified time
         collection.last_modified = timezone.now()
         collection.save(update_fields=updated_fields)
 
@@ -435,7 +435,7 @@ class CollectionActionView(View):
         try:
             collection = get_object_or_404(Collection, pk=collection_id)
             
-            # 获取合集中的所有视频，按last_modified倒序排列
+            # Get all videos in the collection, sorted by last_modified in descending order
             videos = collection.videos.all().order_by('-last_modified')
             
             video_list = []

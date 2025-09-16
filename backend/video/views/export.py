@@ -12,7 +12,7 @@ from ..models import Video
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ExportTaskAddView(View):
-    """添加视频导出任务"""
+    """Add video export task"""
     
     def post(self, request):
         try:
@@ -23,35 +23,35 @@ class ExportTaskAddView(View):
             if not video_id:
                 return JsonResponse({
                     'success': False,
-                    'message': '缺少视频ID'
+                    'message': 'Missing video ID'
                 })
             
-            # 检查视频是否存在
+            # Check if video exists
             try:
                 video = Video.objects.get(pk=video_id)
             except Video.DoesNotExist:
                 return JsonResponse({
                     'success': False,
-                    'message': '视频不存在'
+                    'message': 'Video does not exist'
                 })
             
-            # 检查字幕文件是否存在
+            # Check if subtitle files exist
             if subtitle_type in ['raw', 'both'] and not video.srt_path:
                 return JsonResponse({
                     'success': False,
-                    'message': '该视频没有原文字幕文件'
+                    'message': 'This video has no raw subtitle file'
                 })
             
             if subtitle_type in ['translated', 'both'] and not video.translated_srt_path:
                 return JsonResponse({
                     'success': False,
-                    'message': '该视频没有译文字幕文件'
+                    'message': 'This video has no translated subtitle file'
                 })
             
-            # 生成任务ID
+            # Generate task ID
             task_id = f"export_{video_id}_{int(time.time())}"
             
-            # 初始化任务状态
+            # Initialize task status
             export_task_status[task_id].update({
                 "video_id": video_id,
                 "video_name": video.name,
@@ -62,28 +62,28 @@ class ExportTaskAddView(View):
                 "error_message": "",
             })
             
-            # 添加到队列
+            # Add to queue
             export_queue.put(task_id)
             
             return JsonResponse({
                 'success': True,
-                'message': '导出任务已添加到队列',
+                'message': 'Export task added to queue',
                 'task_id': task_id
             })
             
         except json.JSONDecodeError:
             return JsonResponse({
                 'success': False,
-                'message': '无效的JSON数据'
+                'message': 'Invalid JSON data'
             })
         except Exception as e:
             return JsonResponse({
                 'success': False,
-                'message': f'服务器错误: {str(e)}'
+                'message': f'Server error: {str(e)}'
             })
 
 class AllExportStatusView(View):
-    """获取所有导出任务状态"""
+    """Get all export task statuses"""
     
     def get(self, request):
         return JsonResponse({
@@ -92,13 +92,13 @@ class AllExportStatusView(View):
         })
 
 class ExportStatusView(View):
-    """获取单个导出任务状态"""
+    """Get single export task status"""
     
     def get(self, request, task_id):
         if task_id not in export_task_status:
             return JsonResponse({
                 'success': False,
-                'message': '任务不存在'
+                'message': 'Task does not exist'
             })
         
         return JsonResponse({
@@ -108,18 +108,18 @@ class ExportStatusView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class DeleteExportTaskView(View):
-    """删除导出任务"""
+    """Delete export task"""
     
     def delete(self, request, task_id):
         if task_id not in export_task_status:
             return JsonResponse({
                 'success': False,
-                'message': '任务不存在'
+                'message': 'Task does not exist'
             })
         
         task = export_task_status[task_id]
         
-        # 删除输出文件（如果存在）
+        # Delete output file (if exists)
         import os
         if task['output_filename']:
             output_path = os.path.join('work_dir/export_videos', task['output_filename'])
@@ -129,70 +129,70 @@ class DeleteExportTaskView(View):
             except Exception as e:
                 print(f"Failed to delete export file: {e}")
         
-        # 从任务状态中删除
+        # Delete from task status
         del export_task_status[task_id]
         
         return JsonResponse({
             'success': True,
-            'message': '任务已删除'
+            'message': 'Task deleted'
         })
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RetryExportTaskView(View):
-    """重试导出任务"""
+    """Retry export task"""
     
     def post(self, request, task_id):
         if task_id not in export_task_status:
             return JsonResponse({
                 'success': False,
-                'message': '任务不存在'
+                'message': 'Task does not exist'
             })
         
         task = export_task_status[task_id]
         
-        # 重置任务状态
+        # Reset task status
         export_update_status(task_id, "Queued", 0, "")
         task['output_filename'] = ""
         
-        # 重新添加到队列
+        # Re-add to queue
         export_queue.put(task_id)
         
         return JsonResponse({
             'success': True,
-            'message': '任务已重新添加到队列'
+            'message': 'Task re-added to queue'
         })
 
 class ExportedVideoDownloadView(View):
-    """下载导出的视频文件"""
+    """Download exported video file"""
     
     def get(self, request, task_id):
         if task_id not in export_task_status:
-            raise Http404("任务不存在")
+            raise Http404("Task does not exist")
         
         task = export_task_status[task_id]
         
-        # 检查任务状态和输出文件
+        # Check task status and output file
         if task['status'] != 'Completed' or not task['output_filename']:
-            raise Http404("文件不可用")
+            raise Http404("File not available")
         
-        # 构建文件路径
+        # Build file path
         export_dir = 'work_dir/export_videos'
         file_path = os.path.join(export_dir, task['output_filename'])
         
         if not os.path.exists(file_path):
-            raise Http404("文件不存在")
+            raise Http404("File does not exist")
         
-        # 获取文件信息
+        # Get file information
         file_size = os.path.getsize(file_path)
         content_type, encoding = mimetypes.guess_type(file_path)
         if not content_type:
             content_type = 'video/mp4'
         
-        # 处理 Range 请求（用于支持断点续传和视频播放器的快进）
+        # Handle Range requests (for supporting resume and video player seek)
         range_header = request.headers.get('Range')
         if range_header:
             import re
-            # 解析 Range 请求头
+            # Parse Range request header
             range_match = re.search(r'bytes=(\d+)-(\d*)', range_header)
             if range_match:
                 start = int(range_match.group(1))
@@ -203,7 +203,7 @@ class ExportedVideoDownloadView(View):
                 
                 length = end - start + 1
                 
-                # 创建分片响应
+                # Create partial response
                 def file_iterator(file_path, start, length, chunk_size=8192):
                     with open(file_path, 'rb') as f:
                         f.seek(start)
@@ -227,7 +227,7 @@ class ExportedVideoDownloadView(View):
                 
                 return response
         
-        # 普通的完整文件下载
+        # Normal complete file download
         def file_iterator(file_path, chunk_size=8192):
             with open(file_path, 'rb') as f:
                 while True:

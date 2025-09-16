@@ -28,7 +28,7 @@ class CategoryActionView(View):
             return self.delete(request, video_id)
         elif self.action == 'add':
             return self.add(request, video_id)
-        # 其它动作不允许 POST
+        # Other actions not allowed for POST
         return HttpResponseNotAllowed(['POST'])
     def get(self, request, video_id):
         if self.action == 'query':
@@ -66,14 +66,14 @@ class CategoryActionView(View):
                     status=400
                 )
 
-            # 检查分类是否已存在（不区分大小写）
+            # Check if category already exists (case-insensitive)
             if Category.objects.filter(name__iexact=category_name).exists():
                 return JsonResponse(
                     {'success': False, 'error': 'Category already exists'},
                     status=409
                 )
 
-            # 创建新分类
+            # Create new category
             new_category = Category.objects.create(
                 name=category_name,
                 created_time=timezone.now()
@@ -101,39 +101,39 @@ class CategoryActionView(View):
 
     def rename(self, request, id, **__):
         try:
-            # 解析 JSON 数据
+            # Parse JSON data
             data = json.loads(request.body)
             old_name = data.get('oldName')
             new_name = data.get('newName')
             print(old_name, new_name)
-            # 参数验证
+            # Parameter validation
             if not old_name or not new_name:
                 return JsonResponse(
                     {'error': 'Old or new category name missing'},
                     status=400
                 )
             
-            # 确保分类名称是字符串
+            # Ensure category names are strings
             if not isinstance(old_name, str) or not isinstance(new_name, str):
                 return JsonResponse(
                     {'error': 'Category names must be strings'},
                     status=400
                 )
-            # 更新分类名称
-            # 如果新旧名称相同,则直接返回" name not changed "
+            # Update category name
+            # If old and new names are the same, return "name not changed"
             if old_name.lower() == new_name.lower():
                 return JsonResponse({
                     'success': False,
                     'message': 'Category name unchanged'
                 })
                 
-            # 检查新分类名称是否已存在
+            # Check if new category name already exists
             if Category.objects.filter(name__iexact=new_name).exists():
                 return JsonResponse(
                     {'error': 'New category name already exists'},
                     status=409
                 )
-            # 检查旧分类名称是否存在
+            # Check if old category name exists
             if not Category.objects.filter(name__iexact=old_name).exists():
                 return JsonResponse(
                     {'error': 'Old category name does not exist'},
@@ -170,7 +170,7 @@ class CategoryActionView(View):
                     status=400
                 )
 
-            # 获取分类对象
+            # Get category object
             category = Category.objects.filter(name__iexact=category_name).first()
             if not category:
                 return JsonResponse(
@@ -178,10 +178,10 @@ class CategoryActionView(View):
                     status=404
                 )
 
-            # 将该分类下的所有视频的category设为null
+            # Set category to null for all videos in this category
             Video.objects.filter(category=category).update(category=None)
 
-            # 删除分类
+            # Delete category
             category.delete()
 
             return JsonResponse({
