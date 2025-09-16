@@ -2,7 +2,7 @@
 <template>
   <!-- 深色主题背景容器,min-h-screen:这个元素的最小高度等于整个视口的高度。 -->
   <div class="min-h-screen bg-[#1B316A]">
-    <!-- Header -->
+    <!-- 头部导航栏 -->
     <NavBar
       :showTranslation="showTranslation"
       :progress="videoProgress"
@@ -17,11 +17,11 @@
     <div class="h-[calc(100vh+70px)] flex gap-6 p-6 min-w-0">
       <!-- 左侧视频和波形区域 -->
       <div class="flex-[2] flex flex-col min-h-0 gap-6 min-w-0">
-        <!-- Video Player -->
+        <!-- 视频播放器 -->
         <div
           class="flex-[2] flex flex-col min-h-0 bg-gradient-to-r from-slate-800/90 to-slate-700/90 backdrop-blur-lg rounded-2xl p-4 border border-slate-600/50 shadow-2xl min-w-0"
         >
-          <!-- Use a fill container instead of aspect-video so it can stretch -->
+          <!-- 使用填充容器替代 aspect-video，以便可伸缩 -->
           <div class="relative w-full h-full overflow-hidden">
             <VideoPlayer
               ref="playerRef"
@@ -34,7 +34,7 @@
           </div>
         </div>
 
-        <!-- Waveform Viewer -->
+        <!-- 波形查看器 -->
         <div
           ref="waveformContainerRef"
           class="flex-[1] p-4 border border-slate-600/50 bg-gradient-to-r from-slate-800/90 to-slate-700/90 backdrop-blur-lg rounded-2xl shadow-2xl min-w-0"
@@ -76,7 +76,7 @@
         </div>
       </div>
     </div>
-    <!-- Settings Dialog -->
+    <!-- 设置弹窗 -->
     <SettingsDialog v-model:visible="showSettingsDialog" @close="showSettingsDialog = false" />
   </div>
 </template>
@@ -99,7 +99,7 @@ import SettingsDialog from '@/components/dialogs/SettingsDialog.vue'
 
 const subtitles = ref<Subtitle[]>([]) // 存真正的字幕数组
 const waveformContainerRef = ref<HTMLDivElement>()
-const waveformHeight = ref(200) // Default height
+const waveformHeight = ref(200) // 默认高度
 let waveformResizeObserver: ResizeObserver | null = null
 
 function subsLoad(raw: Subtitle[]) {
@@ -121,21 +121,21 @@ const defaultVideoInfo: VideoInfoData = {
 const playerRef = ref<InstanceType<typeof VideoPlayer> | null>(null) // ← ①
 const subtitleEditorRef = ref<InstanceType<typeof SubtitleEditor> | null>(null)
 
-// Router setup
+// 路由配置
 const route = useRoute()
 
-// Get route params and fix basename dot issue like WatchVideo.vue
+// 获取并处理路由参数（参考 WatchVideo.vue）
 const routeParams = route.params
 const basenameRaw = (routeParams.basename || routeParams['basename.']) as string
 const ext = routeParams.ext as string
 
-// Remove trailing dot and create filename
+// 去除末尾点并生成文件名
 const basename = basenameRaw?.replace(/\.$/, '') || ''
 const fileName = ref(`${basename}.${ext?.toLowerCase() || ''}`)
 
 const isAudio = /^(m4a|mp3|wav)$/.test(ext?.toLowerCase() || '')
 
-// ───────────────── state ─────────────────
+// ───────────────── 状态 ─────────────────
 const showTranslation = ref(false)
 
 function updateBloburl(blobUrlsAccepted: Array<string | undefined>) {
@@ -147,7 +147,7 @@ function handleSeekFromWaveform(t: number) {
   // 点击对应位置的字幕,视频自动跳转到对应时间.
   currentTime.value = t
   console.log(currentTime.value)
-  playerRef.value?.seek(t) // ← ② jump the player
+  playerRef.value?.seek(t) // ← ② 跳转播放器至对应时间
 }
 
 const videoProgress = computed(() => (duration.value ? currentTime.value / duration.value : 0))
@@ -157,12 +157,12 @@ function handleTimeUpdate(t: number) {
   console.log('currentTime', currentTime)
   console.log(videoProgress.value)
 }
-// No longer need props since we get route params directly
+// 不再需要通过 props 获取参数，直接使用路由
 
 const videoData = ref<VideoInfoData>(defaultVideoInfo)
 
 const showSettingsDialog = ref(false)
-const showRegions = ref(true) // Control waveform regions visibility
+const showRegions = ref(true) // 控制波形区域可见性
 const videoId = ref(-1)
 const subtitleFont = ref('Arial')
 const subtitleColor = ref('#6a9749')
@@ -172,19 +172,19 @@ const currentTime = ref(0)
 function handleSeekFromSubs(t: number) {
   // 点击对应位置的字幕,视频自动跳转到对应时间.
   currentTime.value = t
-  playerRef.value?.seek(t) // ← ② jump the player
+  playerRef.value?.seek(t) // ← ② 跳转播放器至对应时间
 }
 
 function handleSubtitleUpdated(index: number, newStart: number, newEnd: number) {
-  // Update the subtitle data when dragged in waveform
+// 拖动波形区域时更新字幕数据
   if (subtitles.value[index]) {
     subtitles.value[index].start = newStart
     subtitles.value[index].end = newEnd
 
-    // Force reactivity update
+    // 强制触发响应式更新
     subtitles.value = [...subtitles.value]
 
-    // Also update the subtitle editor's internal data
+    // 同时更新字幕编辑器内部数据
     if (subtitleEditorRef.value && 'updateSubtitleTiming' in subtitleEditorRef.value) {
       ;(subtitleEditorRef.value as any).updateSubtitleTiming(index, newStart, newEnd)
     }
@@ -207,13 +207,13 @@ const videoSrc = computed(() => {
   return src
 })
 
-// Function to load video data like WatchVideo.vue
+// 加载视频数据函数（参考 WatchVideo.vue）
 async function loadVideoData(filename: string) {
   try {
     console.log('Loading video data for:', filename)
     const data = await getVideoInfo(filename)
 
-    // Ensure description is never null
+    // 确保 description 不为空
     videoData.value = {
       ...data,
       description: data.description || '暂无描述',
@@ -225,28 +225,28 @@ async function loadVideoData(filename: string) {
     duration.value = hhmmssToSeconds(videoData.value.videoLength)
     videoId.value = videoData.value.id
 
-    // Update browser tab title - check if name is not the default
+    // 更新浏览器标签标题，若名称不是默认
     if (videoData.value.name && videoData.value.name !== '（未命名视频）') {
       document.title = `${videoData.value.name} - VidGo 字幕编辑器`
       console.log('Browser title updated to:', document.title)
     } else {
       console.warn('Video name is empty or default, not updating title')
-      // Fallback to filename without extension
+      // 回退到无扩展名的文件名
       const nameFromFile = filename.replace(/\.[^/.]+$/, '')
       document.title = `${nameFromFile} - VidGo 字幕编辑器`
     }
   } catch (error) {
     console.error('Failed to load video info:', error)
-    // Set default video data
+    // 设置默认视频数据
     videoData.value = { ...defaultVideoInfo }
-    // Fallback to filename without extension
+    // 回退到无扩展名的文件名
     const nameFromFile = filename.replace(/\.[^/.]+$/, '')
     document.title = `${nameFromFile} - VidGo 字幕编辑器`
     ElMessage.error('加载视频信息失败')
   }
 }
 
-// Watch for route params changes to reload video data
+// 监听路由参数变化以重新加载视频数据
 const waveformReady = ref(false)
 onMounted(async () => {
   // console.log('Route params:', routeParams)
@@ -256,7 +256,7 @@ onMounted(async () => {
   // console.log('Current path:', route.path)
   await loadVideoData(fileName.value)
   waveformReady.value = true // 再让子组件挂载
-  // Load saved preferences
+    // 加载已保存的用户偏好
   try {
     const savedFont = localStorage.getItem('subtitleFont')
     const savedColor = localStorage.getItem('subtitleColor')
@@ -268,14 +268,14 @@ onMounted(async () => {
     console.error('Failed to load subtitle preferences:', e)
   }
 
-  // Setup waveform container ResizeObserver
+  // 设置波形容器的 ResizeObserver
   if (waveformContainerRef.value) {
     waveformResizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { height } = entry.contentRect
-        // Calculate waveform height with padding adjustment
-        const newHeight = Math.max(150, height - 80) // More conservative padding to account for header and margins
-        // Only update if the change is significant to prevent feedback loops
+        // 计算波形高度，并考虑内边距调整
+        const newHeight = Math.max(150, height - 80) // 更保守的内边距调整，以适应头部和边距
+        // 仅在变化显著时更新，防止循环反馈
         if (Math.abs(newHeight - waveformHeight.value) > 10) {
           console.log('Updating waveform height from', waveformHeight.value, 'to', newHeight)
           waveformHeight.value = newHeight

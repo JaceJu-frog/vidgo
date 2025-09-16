@@ -207,8 +207,6 @@ watch(currentTime, (newVal) => {
 })
 
 function handlePlayPauseToggle() {
-  // toggle translation/raw display
-  // to be continued
   if (!playerRef.value) return
 }
 
@@ -472,7 +470,7 @@ onMounted(() => {
 <template>
   <!-- 深色主题背景容器 -->
   <div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-blue-900">
-    <!-- NavBar with user and edit button -->
+    <!-- 导航栏组件，含用户信息与设置按钮 -->
     <NavBar
       v-if="!isVideoFullscreen"
       :showTranslation="showTranslation"
@@ -490,7 +488,7 @@ onMounted(() => {
       <div :class="isVideoFullscreen ? 'grid grid-cols-1' : 'grid lg:grid-cols-3 gap-6'">
         <!-- 左侧视频播放区域 -->
         <div :class="isVideoFullscreen ? 'col-span-1 space-y-4' : 'lg:col-span-2 space-y-4'">
-          <!-- Video Player Card -->
+          <!-- 视频播放器卡片容器 -->
           <div
             class="bg-gradient-to-r from-slate-800/90 to-slate-700/90 backdrop-blur-lg rounded-2xl p-4 border border-slate-600/50 shadow-2xl"
           >
@@ -509,7 +507,7 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- VideoInfo Card with tabs -->
+          <!-- 视频信息卡片，带选项卡 -->
           <div
             class="bg-gradient-to-r from-slate-800/90 to-slate-700/90 backdrop-blur-lg rounded-2xl border border-slate-600/50 shadow-2xl"
             :class="{ 'fullscreen-hidden': isVideoFullscreen }"
@@ -534,7 +532,7 @@ onMounted(() => {
 
         <!-- 右侧侧边栏 -->
         <div v-show="!isVideoFullscreen" class="space-y-4" :class="{ 'fullscreen-hidden': isVideoFullscreen }">
-          <!-- TabbedPanel Card -->
+          <!-- 选项卡面板卡片 -->
           <div
             class="bg-gradient-to-r from-slate-800/90 to-slate-700/90 backdrop-blur-lg rounded-2xl border border-slate-600/50 shadow-2xl"
           >
@@ -551,7 +549,7 @@ onMounted(() => {
             <div v-else class="text-slate-400 text-center py-8">{{ t('loadingSubtitles') }}</div>
           </div>
 
-          <!-- PlayList Card -->
+          <!-- 播放列表卡片 -->
           <div
             class="bg-gradient-to-r from-slate-800/90 to-slate-700/90 backdrop-blur-lg rounded-2xl border border-slate-600/50 shadow-2xl"
           >
@@ -570,34 +568,34 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Fullscreen handling - hide other components properly */
+/* 全屏处理 - 隐藏其他组件 */
 .fullscreen-hidden {
   display: none !important;
   visibility: hidden !important;
 }
 
-/* Fix Video.js fullscreen subtitle display */
+/* 修复 Video.js 全屏模式下字幕显示层级 */
 :deep(.video-js.vjs-fullscreen) {
-  z-index: 2147483647 !important; /* Maximum z-index */
+  z-index: 2147483647 !important;
 }
 
 :deep(.vjs-fullscreen .vjs-text-track-display) {
-  z-index: 1000 !important; /* Subtitles on top of video */
+  z-index: 1000 !important; /* 字幕位于视频之上 */
 }
 
 :deep(.vjs-fullscreen .vjs-control-bar) {
-  z-index: 1001 !important; /* Controls above subtitles */
+  z-index: 1001 !important; /* 控件位于字幕之上 */
 }
 
 :deep(.vjs-fullscreen .vjs-menu) {
-  z-index: 1002 !important; /* Menus above controls */
+  z-index: 1002 !important; /* 菜单位于控件之上 */
 }
 
 :deep(.vjs-fullscreen .vjs-modal-dialog) {
-  z-index: 1003 !important; /* Modals on top */
+  z-index: 1003 !important; /* 弹窗位于最上层 */
 }
 
-/* Ensure hotkey hints show above everything in fullscreen */
+/* 确保全屏模式下快捷键提示显示最上层 */
 .fixed.z-50 {
   z-index: 1004 !important;
 }
