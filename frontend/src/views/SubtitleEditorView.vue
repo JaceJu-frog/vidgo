@@ -1,3 +1,4 @@
+<!-- 字幕编辑器，核心功能 -->
 <template>
   <!-- 深色主题背景容器,min-h-screen:这个元素的最小高度等于整个视口的高度。 -->
   <div class="min-h-screen bg-[#1B316A]">

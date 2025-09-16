@@ -1,4 +1,4 @@
-<!-- src/components/VideoCards.vue -->
+<!-- 媒体卡片显示 -->
 <script setup lang="ts">
 import { computed } from 'vue'
 import VideoCard from '@/components/Home/VideoCard.vue'

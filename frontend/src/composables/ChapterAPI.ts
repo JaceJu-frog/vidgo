@@ -1,3 +1,4 @@
+// 章节API
 import { getCSRFToken } from './GetCSRFToken'
 
 export interface Chapter {

@@ -1,3 +1,4 @@
+<!-- 视频信息组件 -->
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { markdownToHtml } from '@/composables/ConvertMarkdown'

@@ -1,3 +1,4 @@
+// 笔记API
 import { getCSRFToken } from './GetCSRFToken'
 
 import { BACKEND } from '@/composables/ConfigAPI'

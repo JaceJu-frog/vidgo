@@ -1,3 +1,4 @@
+<!-- 字幕编辑器核心 -->
 <template>
   <!-- All elements for subtitle Editor,In card vision -->
   <div class="w-full h-full flex flex-col">

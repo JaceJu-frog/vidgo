@@ -1,3 +1,4 @@
+<!-- 主要布局组件，复杂业务逻辑 -->
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { defineExpose, computed } from 'vue'

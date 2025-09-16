@@ -1,3 +1,4 @@
+// 字幕样式处理
 import { ref, computed, watch } from 'vue'
 import { loadConfig, type FrontendSettings } from './ConfigAPI'
 

@@ -1,3 +1,4 @@
+<!-- 字幕面板 -->
 <script setup lang="ts">
 import type { Subtitle } from '@/types/subtitle'
 import { useSubtitles } from '@/composables/useSubtitles'

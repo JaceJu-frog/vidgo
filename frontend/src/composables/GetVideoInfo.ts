@@ -1,3 +1,4 @@
+// 获取视频信息API
 import type { VideoInfoData } from '@/types/media'
 import { BACKEND } from '@/composables/ConfigAPI'
 

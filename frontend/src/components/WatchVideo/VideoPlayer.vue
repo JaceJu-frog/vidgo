@@ -1,3 +1,4 @@
+<!-- 视频播放器核心组件 -->
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import videojs from 'video.js'

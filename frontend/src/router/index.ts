@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+// 路由配置：定义应用的页面路由和参数传递规则
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -9,7 +10,7 @@ const router = createRouter({
       component: () => import('@/views/HomeView.vue'),
     },
 
-    // /watch/stream/foo.mp4 for HLS playback
+    // 流媒体视频播放路由：/watch/stream/foo.mp4 用于HLS播放
     {
       path: '/watch/stream/:basename([^/]+?)\\.:ext(mp4|webm|mkv|m4a|mp3|wav|aac)',
       name: 'watch-stream-video',
@@ -17,10 +18,11 @@ const router = createRouter({
       props: (route) => ({
         basename: route.params.basename as string,
         ext: route.params.ext as string,
-        stream: true,
+        stream: true, // 标识为流媒体模式
       }),
     },
-    // /watch/foo.mp4 for normal playbook
+
+    // 普通视频播放路由：/watch/foo.mp4 用于常规播放
     {
       path: '/watch/:basename([^/]+)\\.:ext(mp4|webm|mkv|m4a|mp3|wav|aac)',
       name: 'watch-video',
@@ -28,11 +30,11 @@ const router = createRouter({
       props: (route) => ({
         basename: route.params.basename as string,
         ext: route.params.ext as string,
-        stream: false,
+        stream: false, // 标识为普通播放模式
       }),
     },
 
-    // /editor/foo.mp4
+    // 字幕编辑器路由：/editor/foo.mp4
     {
       path: '/editor/:basename([^/]+)\\.:ext(mp4|webm|mkv|m4a|mp3|wav|aac)',
       name: 'subtitle-editor',
@@ -43,6 +45,7 @@ const router = createRouter({
       },
     },
 
+    // 波形测试页面（开发调试用）
     {
       path: '/waveform-test',
       name: 'waveform-test',

@@ -1,3 +1,4 @@
+<!-- 视频播放页面，核心功能 -->
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -13,34 +14,34 @@ import { getVideoInfo } from '@/composables/GetVideoInfo'
 import { hhmmssToSeconds } from '@/composables/TimeFunc'
 import { useI18n } from 'vue-i18n'
 
-// Function to parse time strings from URL fragments like #t=90, #t=1m30s, #t=1h30m45s
+// 解析URL时间戳参数：支持 #t=90, #t=1m30s, #t=1h30m45s 等格式
 function parseTimeString(timeStr: string): number {
   if (!timeStr) return 0
 
-  // Remove any whitespace
+  // 去除空白字符
   timeStr = timeStr.trim()
 
-  // If it's just a number, treat as seconds
+  // 如果只是纯数字，直接当作秒数处理
   if (/^\d+(\.\d+)?$/.test(timeStr)) {
     return parseFloat(timeStr)
   }
 
-  // Parse time format: 1h30m45s, 30m45s, 45s, etc.
+  // 解析时间格式：1h30m45s, 30m45s, 45s 等
   let totalSeconds = 0
 
-  // Extract hours
+  // 提取小时部分
   const hoursMatch = timeStr.match(/(\d+)h/)
   if (hoursMatch) {
     totalSeconds += parseInt(hoursMatch[1]) * 3600
   }
 
-  // Extract minutes
+  // 提取分钟部分
   const minutesMatch = timeStr.match(/(\d+)m/)
   if (minutesMatch) {
     totalSeconds += parseInt(minutesMatch[1]) * 60
   }
 
-  // Extract seconds
+  // 提取秒数部分
   const secondsMatch = timeStr.match(/(\d+(?:\.\d+)?)s/)
   if (secondsMatch) {
     totalSeconds += parseFloat(secondsMatch[1])
