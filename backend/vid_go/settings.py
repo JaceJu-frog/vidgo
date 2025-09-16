@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,43 +27,73 @@ SECRET_KEY = 'django-insecure-t*f^ky%62$)j_af*qs7)m&pwb-)1lgc&u22a^yj!e=6_@s@%dn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Helper function to get environment variable as list
+def __get_list(env_var, default=None):
+    """Get environment variable as a comma-separated list"""
+    value = os.getenv(env_var)
+    if value:
+        return [item.strip() for item in value.split(',') if item.strip()]
+    return default or []
+
 # 允许承载server的 Host
-# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '172.28.241.92','172.28.241.172','172.28.241.47']
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = __get_list('VIDGO_ALLOWED_HOSTS', ['*'])
 
-# 前端可以从这些Host 发起fetch/XHR，从而获取消息。
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:4173",
-#     "http://127.0.0.1:4173",
-#     "http://127.0.0.1:5500",
-#     "http://127.0.0.1:5501",
-#     "http://172.28.241.92:4173",
-#     "http://172.28.241.92:4175",
-#     "http://172.28.241.92:5500",
-#     "http://172.28.241.92:5501",
-#     "http://172.28.241.92:8080",
-#     "http://172.28.241.47:4173",
-#     "http://172.28.241.172:4173",
-#     "http://172.28.241.172:8080",
-# ]
+# Dynamic CORS and CSRF configuration
+CORS_ALLOWED_ORIGINS = __get_list(
+    'VIDGO_CORS_ALLOWED_ORIGINS',
+    ["http://localhost:4173", "http://127.0.0.1:4173"]  # Default for development
+)
 
-# # 服务器不会将来自这些Host的请求当成潜在 CSRF 攻击而拒绝
-#     # 仅对 带 Cookie 会话 的 状态改变请求（POST/PUT/DELETE/PATCH…）生效。
-#     # 纯粹的 GET/HEAD 不检查 CSRF。
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:4173",
-    "http://172.28.241.172:4173",
-    "http://127.0.0.1:4173",
-    "http://172.28.241.92:4173", 
-    "http://172.28.241.47:4173", 
-    "http://172.28.241.92:8080", 
-    "http://172.28.241.172:4173",
-    "http://172.28.241.172:8080",
-]
+CSRF_TRUSTED_ORIGINS = __get_list(
+    'VIDGO_CSRF_TRUSTED_ORIGINS',
+    ["http://localhost:4173", "http://127.0.0.1:4173"]  # Default for development
+)
 
-# CORS 设置（如果前端需要跨域请求）
-CORS_ALLOW_ALL_ORIGINS = True
+# Function to parse VIDGO_URL and automatically configure CORS, CSRF, and ALLOWED_HOSTS
+def _parse_vidgo_url():
+    """Parse VIDGO_URL environment variable and configure related settings"""
+    global CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, ALLOWED_HOSTS
+
+    url = os.getenv("VIDGO_URL")
+    if url:
+        # Add to CSRF trusted origins
+        if url not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(url)
+
+        # Add to CORS allowed origins
+        if url not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(url)
+
+        # Add hostname to ALLOWED_HOSTS
+        parsed_url = urlparse(url)
+        hostname = parsed_url.hostname
+        if hostname and hostname not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(hostname)
+
+# Parse VIDGO_URL if provided
+_parse_vidgo_url()
+
+# Add development origins in DEBUG mode
+if DEBUG:
+    dev_origins = [
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
+        "http://localhost:8080",
+        "http://127.0.0.1:8080"
+    ]
+    for origin in dev_origins:
+        if origin not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(origin)
+        if origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(origin)
+
+# CORS 设置
 CORS_ALLOW_CREDENTIALS = True
+
+# Expose headers for file downloads
+CORS_EXPOSE_HEADERS = [
+    "Content-Disposition",
+]
 
 # Application definition
 
@@ -78,7 +110,7 @@ INSTALLED_APPS = [
 ]
 
 
-CORS_ALLOW_CREDENTIALS = True      # ← required for cookies
+# Note: CORS_ALLOW_CREDENTIALS is already set above
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -150,8 +182,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# settings.py
-import os
+# Media settings
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # 指向项目根目录下的 media 文件夹
 MEDIA_URL = '/media/'  # 访问媒体的 URL 前缀

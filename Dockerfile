@@ -95,7 +95,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     DJANGO_SETTINGS_MODULE=vid_go.settings \
     HF_ENDPOINT=https://hf-mirror.com \
     HUGGINGFACE_HUB_CACHE=/app/models/.cache/huggingface \
-    APP_CONFIG_DIR=/app/config
+    APP_CONFIG_DIR=/app/config \
+    VIDGO_ALLOWED_HOSTS=* \
+    VIDGO_CORS_ALLOWED_ORIGINS=http://localhost:4173,http://127.0.0.1:4173 \
+    VIDGO_CSRF_TRUSTED_ORIGINS=http://localhost:4173,http://127.0.0.1:4173
 
 VOLUME ["/app/config", "/app/database", "/app/media", "/app/models"]
 
