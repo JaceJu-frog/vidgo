@@ -45,7 +45,6 @@ backend/video/app.py
 *.pyc
 
 # frontend
-frontend/.env
 frontend/*.tsbuildinfo
 frontend/.claude/
 frontend/.vscode/
